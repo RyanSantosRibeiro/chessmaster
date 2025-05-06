@@ -1,0 +1,151 @@
+Claro, aqui está a documentação da plataforma em **Markdown**:
+
+---
+
+# Documentação da Plataforma de Xadrez com Apostas
+
+## Resumo do Sistema
+
+Esta plataforma permite que usuários joguem partidas de xadrez online, em formato 1x1, apostando valores reais (via Pix ou Bitcoin). O vencedor recebe 80% do valor total apostado, e a casa retém 20%. O sistema conta com:
+
+* Cadastro e autenticação de usuários
+* Carteira interna (saldo)
+* Compra de tickets para partidas
+* Sistema de lobby e pareamento
+* Recompensas em troféus para rankeamento
+* Solicitações de saque
+* Painel administrativo
+
+---
+
+## Casos de Uso
+
+### 1. Registro e Criação de Conta
+
+**Atores:** Usuário
+
+**Fluxo:**
+
+1. Usuário acessa a plataforma e realiza cadastro com e-mail e senha.
+2. Um perfil é criado na tabela `profiles` com os campos:
+
+   * `id`
+   * `username`
+   * `balance_cents`
+   * `trophies`
+
+### 2. Depósito de Saldo
+
+**Atores:** Usuário, Stripe, Webhook
+
+**Fluxo:**
+
+1. Usuário escolhe valor para adicionar à sua conta.
+2. Stripe processa o pagamento.
+3. Webhook é disparado.
+4. O saldo é atualizado em `profiles.balance_cents`.
+
+### 3. Entrada em Partida
+
+**Atores:** Usuário, Sistema de Lobby
+
+**Fluxo:**
+
+1. Usuário escolhe ticket (R\$5, R\$10 etc.).
+2. Sistema busca adversário de mesmo ticket e ranking aproximado.
+3. Se não encontrado, um lobby é criado.
+4. Quando os dois jogadores estão prontos:
+
+   * O valor do ticket é debitado.
+   * A partida é iniciada.
+
+### 4. Partida e Recompensa
+
+**Atores:** Dois usuários, sistema de jogo
+
+**Fluxo:**
+
+1. Partida de xadrez é jogada.
+2. Ao término:
+
+   * O vencedor recebe 80% do total apostado.
+   * A casa recebe 20%.
+   * Troféus são atualizados no ranking.
+   * Saldos são atualizados.
+
+### 5. Solicitação de Saque
+
+**Atores:** Usuário, Administrador
+
+**Fluxo:**
+
+1. Usuário solicita saque informando valor e chave Pix ou wallet BTC.
+2. Uma entrada é criada em `withdrawals` com status `pendente`.
+3. Admin aprova no painel.
+4. Valor é transferido e status atualizado para `concluído`.
+
+### 6. Painel Administrativo
+
+**Atores:** Administrador
+
+**Fluxo:**
+
+1. Admin acessa painel e vê:
+
+   * Transações recentes
+   * Saques pendentes
+   * Histórico de partidas
+   * Ranking de troféus
+2. Admin pode aprovar ou recusar saques.
+
+---
+
+## Fluxos Técnicos
+
+### Webhooks do Stripe
+
+* Endpoint no backend recebe eventos.
+* Atualiza automaticamente o saldo do usuário.
+
+### Supabase Realtime
+
+* Usado para atualização em tempo real de lobbies e partidas.
+
+### Sistema de Ranking
+
+* Vitórias e derrotas impactam o número de troféus.
+* Ranking serve como critério de pareamento.
+
+### Matchmaking
+
+* Apenas jogadores com ticket e ranking compatível podem jogar juntos.
+* Evita desbalanceamento e fraudes.
+
+---
+
+## Estrutura do Banco de Dados (Supabase)
+
+| Tabela         | Campos principais                                                     |
+| -------------- | --------------------------------------------------------------------- |
+| `users`        | id, email                                                             |
+| `profiles`     | id, username, balance\_cents, trophies                                |
+| `lobbies`      | id, ticket\_amount, players, status                                   |
+| `matches`      | id, player1\_id, player2\_id, winner\_id, ticket\_amount, created\_at |
+| `transactions` | id, user\_id, type (deposit/withdraw), amount, status                 |
+| `withdrawals`  | id, user\_id, amount, pix\_key, status                                |
+
+---
+
+## Jornada do Usuário (Exemplo)
+
+1. João se cadastra na plataforma.
+2. Ele adiciona R\$20 via Pix.
+3. João entra em uma partida com ticket de R\$10.
+4. Ele vence e recebe R\$16 (80%).
+5. Seu saldo agora é R\$26 e ele ganha 15 troféus.
+6. João solicita saque de R\$20.
+7. Admin aprova, e João recebe via Pix.
+
+---
+
+Se quiser, posso gerar essa documentação como arquivo `.md` para você baixar ou publicar. Deseja isso?
