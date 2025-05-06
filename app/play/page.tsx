@@ -1,7 +1,7 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
+// import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 
 export default async function PlayPage() {
@@ -14,10 +14,10 @@ export default async function PlayPage() {
         <h1 className="text-4xl font-bold mb-8">Chess with Stakes</h1>
         <div className="space-y-4">
           <Link href="/signin/signup">
-            <Button className="w-full">Sign Up</Button>
+            {/* <Button className="w-full">Sign Up</Button> */}
           </Link>
           <Link href="/signin">
-            <Button variant="outline" className="w-full">Sign In</Button>
+            {/* <Button variant="outline" className="w-full">Sign In</Button> */}
           </Link>
         </div>
       </div>
@@ -31,7 +31,7 @@ export default async function PlayPage() {
         <div className="space-y-4">
           <h2 className="text-xl font-bold">Play Chess</h2>
           <nav className="space-y-2">
-            <Button className="w-full flex items-center gap-2">
+            {/* <Button className="w-full flex items-center gap-2">
               <span>⚡</span> Play Online
             </Button>
             <Button variant="outline" className="w-full flex items-center gap-2">
@@ -42,7 +42,7 @@ export default async function PlayPage() {
             </Button>
             <Button variant="outline" className="w-full flex items-center gap-2">
               <span>🏆</span> Tournaments
-            </Button>
+            </Button> */}
           </nav>
         </div>
       </div>
