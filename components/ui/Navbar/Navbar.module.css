@@ -1,19 +1,28 @@
 .root {
-  @apply sticky top-0 bg-black z-40 transition-all duration-150 h-16 md:h-20;
+  @apply sticky top-0 left-0 bg-[#13181b] z-40 transition-all duration-150 h-full w-full max-w-[150px];
 }
 
 .link {
-  @apply inline-flex items-center leading-6 font-medium transition ease-in-out duration-75 cursor-pointer text-zinc-200 rounded-md p-1;
+  @apply text-white transition-all duration-150 py-2 font-semibold;
 }
 
-.link:hover {
-  @apply text-zinc-100;
+.button {
+  @apply rounded-md w-full text-center bg-[#4cb2b6] text-white cursor-pointer inline-flex px-5 leading-6  transition ease-in-out duration-150 shadow-sm font-semibold text-center justify-center uppercase py-4 border border-transparent items-center;
 }
 
-.link:focus {
+.button_secondary {
+  @apply rounded-md w-full text-center bg-white text-[#4cb2b6] cursor-pointer inline-flex px-5 leading-6  transition ease-in-out duration-150 shadow-sm font-semibold text-center justify-center uppercase py-4 border border-transparent items-center;
+}
+
+.button:hover,
+.button_secondary:hover {
+  @apply opacity-80;
+}
+
+.button:focus {
   @apply outline-none text-zinc-100 ring-2 ring-pink-500 ring-opacity-50;
 }
 
 .logo {
-  @apply cursor-pointer rounded-full transform duration-100 ease-in-out;
+  @apply mb-4 cursor-pointer rounded-full transform duration-100 ease-in-out;
 }

@@ -23,16 +23,17 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en">
-      <body className="bg-black">
+      <body className="bg-nivel-1">
         <AuthProvider>
-          <Navbar />
-          <main
-            id="skip"
-            className="min-h-[calc(100dvh-4rem)] md:min-h[calc(100dvh-5rem)]"
-          >
-            {children}
-          </main>
-          <Footer />
+          <div className='flex w-full h-screen'>
+              <Navbar />
+              <main
+                id="skip"
+                className="min-h-screen w-full flex flex-col items-center justify-center overflow-hidden"
+              >
+                {children}
+              </main>
+          </div>
           <Suspense>
             <Toaster />
           </Suspense>

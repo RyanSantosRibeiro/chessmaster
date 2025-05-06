@@ -79,3 +79,11 @@ p a {
 .height-screen-helper {
   min-height: calc(100vh - 80px);
 }
+
+.bg-nivel-1 {
+  background-color: #111416;
+}
+
+.bg-nivel-2 {
+  background-color: #13181b;
+}
