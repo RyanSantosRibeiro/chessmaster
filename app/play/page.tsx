@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/Button';
+import Button from '@/components/ui/Button';
 import Link from 'next/link';
 
 export default function PlayPage() {
