@@ -18,15 +18,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
 
   useEffect(() => {
+    async function getUserDetails(userId: string) {
+      const { data } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      return data;
+    }
+
     // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const userDetails = await getUserDetails(session.user.id);
+        setUser({ ...session.user, ...userDetails });
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
 
     // Listen for changes on auth state 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        const userDetails = await getUserDetails(session.user.id);
+        setUser({ ...session.user, ...userDetails });
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
 
