@@ -20,45 +20,49 @@ export default function QueueManager() {
   const { user } = useAuth();
   const supabase = createClient();
 
-  const findMatch = async (newEntry: QueueEntry) => {
+  const findMatch = async (amount: number): Promise<string | null> => {
+    if (!user) return null;
+
+    // Primeiro procura por um oponente compatível
     const { data: potentialMatch } = await supabase
       .from('queue')
       .select('*')
       .eq('status', 'searching')
-      .eq('ticket_amount_cents', newEntry.ticket_amount_cents)
-      .neq('user_id', newEntry.user_id)
-      .filter('rank_points', 'gte', newEntry.rank_points - 200)
-      .filter('rank_points', 'lte', newEntry.rank_points + 200)
+      .eq('ticket_amount_cents', amount * 100)
+      .neq('user_id', user.id)
+      .filter('rank_points', 'gte', 800) // rank - 200
+      .filter('rank_points', 'lte', 1200) // rank + 200
       .maybeSingle();
 
     if (potentialMatch) {
-      // Create match
-      const { data: match } = await supabase
+      // Cria a partida
+      const { data: match, error: matchError } = await supabase
         .from('matches')
         .insert({
-          white_player_id: newEntry.user_id,
+          white_player_id: user.id,
           black_player_id: potentialMatch.user_id,
-          ticket_amount_cents: newEntry.ticket_amount_cents,
+          ticket_amount_cents: amount * 100,
           status: 'in_progress'
         })
         .select()
         .single();
 
-      // Update both queue entries
+      if (matchError) {
+        console.error('Error creating match:', matchError);
+        return null;
+      }
+
+      // Atualiza o status dos jogadores na fila
       await supabase
         .from('queue')
         .update({ status: 'matched' })
-        .in('id', [newEntry.id, potentialMatch.id]);
+        .eq('id', potentialMatch.id);
 
-      return match;
+      return match.id;
     }
-    return null;
-  };
 
-  const joinQueue = async (amount: number) => {
-    if (!user) return;
-
-    const { data: newEntry } = await supabase
+    // Se não encontrou oponente, cria uma nova entrada na fila
+    const { data: newEntry, error: queueError } = await supabase
       .from('queue')
       .insert({
         user_id: user.id,
@@ -68,13 +72,23 @@ export default function QueueManager() {
       .select()
       .single();
 
-    if (newEntry) {
-      setInQueue(true);
-      const match = await findMatch(newEntry);
-      if (match) {
-        // Redirect to game or update UI
-        setInQueue(false);
-      }
+    if (queueError) {
+      console.error('Error joining queue:', queueError);
+      return null;
+    }
+
+    return null;
+  };
+
+  const joinQueue = async (amount: number) => {
+    if (!user) return;
+    
+    setInQueue(true);
+    const matchId = await findMatch(amount);
+    
+    if (matchId) {
+      // Redirecionar para a partida
+      window.location.href = `/match/${matchId}`;
     }
   };
 
@@ -103,7 +117,7 @@ export default function QueueManager() {
       }, (payload) => {
         if (payload.new.status === 'matched') {
           setInQueue(false);
-          // Handle match found, redirect to game
+          // Redirecionar para a partida quando for implementado
         }
       })
       .subscribe();
