@@ -44,10 +44,8 @@ export default function QueueManager() {
         status: 'in_progress',
       });
 
-      await supabase
-        .from('queue')
-        .delete()
-        .in('user_id', [user.id, potentialMatch.user_id]);
+      await supabase.from('queue').delete().eq('user_id', user.id);
+      await supabase.from('queue').delete().eq('user_id', potentialMatch.user_id);
 
       return;
     }
@@ -157,14 +155,8 @@ export default function QueueManager() {
             status: 'in_progress',
           });
 
-          await supabase
-            .from('queue')
-            .update({ status: 'matched' })
-            .eq('id', newPlayer.id);
-          await supabase
-            .from('queue')
-            .update({ status: 'matched' })
-            .eq('id', opponent.id);
+          await supabase.from('queue').delete().eq('user_id', newPlayer.user_id);
+          await supabase.from('queue').delete().eq('user_id', opponent.user_id);
         }
       })
       .subscribe();
