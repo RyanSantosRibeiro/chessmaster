@@ -133,21 +133,36 @@ export default function QueueManager() {
         table: 'queue',
         filter: 'status=eq.searching',
       }, async (payload) => {
-        console.log("canal disparado INSERT");
         const newPlayer = payload.new;
-        console.log({newPlayer});
-
-        const { data: potentialOpponents } = await supabase
-          .from('queue')
-          .select('*')
-          .eq('ticket_amount_cents', newPlayer.ticket_amount_cents)
-          .eq('status', 'searching')
-          .neq('user_id', user.id); // Certifique-se de que não é o mesmo jogador
-
-        const opponent = potentialOpponents.find(
-          (p) =>
-            Math.abs(p.rank_points - newPlayer.rank_points) <= 200
-        );
+        
+        // Se não for meu próprio registro na fila
+        if (newPlayer.user_id !== user.id) {
+          // Verificar se este novo jogador pode ser meu oponente
+          const rankDiff = Math.abs(newPlayer.rank_points - user.rank_points);
+          const sameTicketAmount = newPlayer.ticket_amount_cents === user.ticket_amount_cents;
+          
+          if (rankDiff <= 200 && sameTicketAmount) {
+            // Tentar criar a partida imediatamente
+            const matchId = generateMatchId();
+            
+            try {
+              await supabase.from('matches').insert({
+                url_hash: matchId,
+                white_player_id: user.id,
+                black_player_id: newPlayer.user_id,
+                ticket_amount_cents: newPlayer.ticket_amount_cents,
+                status: 'in_progress'
+              });
+              
+              // Se conseguiu criar a partida, remover da fila
+              await supabase.from('queue').delete().eq('user_id', user.id);
+              await supabase.from('queue').delete().eq('user_id', newPlayer.user_id);
+            } catch (error) {
+              // Se falhou, outro jogador provavelmente já pareou
+              console.log("Failed to create match:", error);
+            }
+          }
+        }
         console.log("opponent");
         console.log({opponent});
         if (opponent) {
