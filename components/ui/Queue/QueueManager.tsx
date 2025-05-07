@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import Button from '../Button';
+import LoadingDots from '../LoadingDots';
 
 type QueueEntry = {
   id: string;
@@ -31,14 +32,14 @@ export default function QueueManager() {
       .maybeSingle();
 
     if (potentialMatch) {
-      // Create lobby
-      const { data: lobby } = await supabase
-        .from('lobbies')
+      // Create match
+      const { data: match } = await supabase
+        .from('matches')
         .insert({
+          white_player_id: newEntry.user_id,
+          black_player_id: potentialMatch.user_id,
           ticket_amount_cents: newEntry.ticket_amount_cents,
-          created_by: newEntry.user_id,
-          joined_by: potentialMatch.user_id,
-          status: 'waiting'
+          status: 'in_progress'
         })
         .select()
         .single();
@@ -49,7 +50,7 @@ export default function QueueManager() {
         .update({ status: 'matched' })
         .in('id', [newEntry.id, potentialMatch.id]);
 
-      return lobby;
+      return match;
     }
     return null;
   };
@@ -69,8 +70,8 @@ export default function QueueManager() {
 
     if (newEntry) {
       setInQueue(true);
-      const lobby = await findMatch(newEntry);
-      if (lobby) {
+      const match = await findMatch(newEntry);
+      if (match) {
         // Redirect to game or update UI
         setInQueue(false);
       }
@@ -102,7 +103,7 @@ export default function QueueManager() {
       }, (payload) => {
         if (payload.new.status === 'matched') {
           setInQueue(false);
-          // Handle match found
+          // Handle match found, redirect to game
         }
       })
       .subscribe();
@@ -122,7 +123,7 @@ export default function QueueManager() {
         </div>
       ) : (
         <div className="text-center">
-          <p className="mb-4">Searching for opponent...</p>
+          <p className="mb-4">Searching for opponent <LoadingDots /></p>
           <Button onClick={leaveQueue} variant="outline">Cancel</Button>
         </div>
       )}
