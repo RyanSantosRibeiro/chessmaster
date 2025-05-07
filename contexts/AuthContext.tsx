@@ -18,21 +18,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
 
   useEffect(() => {
+    console.log("Iniciando Auth")
     async function getUserDetails(userId: string) {
+      
       const { data } = await supabase
         .from('users')
         .select('*')
         .eq('id', userId)
         .single();
+        console.log({getUserDetail: userId, data})
       return data;
+
     }
 
     // Check active sessions and sets the user
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      console.log({session})
       if (session?.user) {
         const userDetails = await getUserDetails(session.user.id);
         setUser({ ...session.user, ...userDetails });
       } else {
+        console.log("Cant load user!")
         setUser(null);
       }
       setLoading(false);
@@ -44,10 +50,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userDetails = await getUserDetails(session.user.id);
         setUser({ ...session.user, ...userDetails });
       } else {
+        console.log("Cant load user!")
         setUser(null);
       }
       setLoading(false);
     });
+
+    console.log({AuthSubscription: subscription})
 
     return () => subscription.unsubscribe();
   }, []);
