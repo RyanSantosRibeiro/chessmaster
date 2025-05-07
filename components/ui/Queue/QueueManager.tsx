@@ -20,6 +20,10 @@ export default function QueueManager() {
   const { user } = useAuth();
   const supabase = createClient();
 
+  const generateMatchId = () => {
+    return Math.random().toString(36).substring(2, 8);
+  };
+
   const findMatch = async (amount: number): Promise<string | null> => {
     if (!user) return null;
 
@@ -35,10 +39,12 @@ export default function QueueManager() {
       .maybeSingle();
 
     if (potentialMatch) {
+      const matchId = generateMatchId();
       // Cria a partida
       const { data: match, error: matchError } = await supabase
         .from('matches')
         .insert({
+          id: matchId,
           white_player_id: user.id,
           black_player_id: potentialMatch.user_id,
           ticket_amount_cents: amount * 100,
@@ -52,13 +58,13 @@ export default function QueueManager() {
         return null;
       }
 
-      // Atualiza o status dos jogadores na fila
+      // Remove ambos os jogadores da fila
       await supabase
         .from('queue')
-        .update({ status: 'matched' })
-        .eq('id', potentialMatch.id);
+        .delete()
+        .in('user_id', [user.id, potentialMatch.user_id]);
 
-      return match.id;
+      return matchId;
     }
 
     // Se não encontrou oponente, cria uma nova entrada na fila
@@ -112,12 +118,12 @@ export default function QueueManager() {
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
-        table: 'queue',
-        filter: `user_id=eq.${user.id}`
+        table: 'matches',
+        filter: `white_player_id=eq.${user.id},black_player_id=eq.${user.id}`
       }, (payload) => {
-        if (payload.new.status === 'matched') {
+        if (payload.eventType === 'INSERT') {
           setInQueue(false);
-          // Redirecionar para a partida quando for implementado
+          window.location.href = `/match/${payload.new.id}`;
         }
       })
       .subscribe();
