@@ -80,44 +80,44 @@ export default function QueueManager() {
     setInQueue(false);
   };
 
-  useEffect(() => {
-    if (!user) return;
+  // useEffect(() => {
+  //   if (!user) return;
 
-    const channelWhite = supabase
-      .channel('match_white')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'matches',
-        filter: `white_player_id=eq.${user.id}`,
-      }, (payload) => {
-        setInQueue(false);
-        console.log("Macth")
-        console.log(payload.new.url_hash)
-        // window.location.href = `/match/${payload.new.url_hash}`;
-      })
-      .subscribe();
+  //   const channelWhite = supabase
+  //     .channel('match_white')
+  //     .on('postgres_changes', {
+  //       event: 'INSERT',
+  //       schema: 'public',
+  //       table: 'matches',
+  //       filter: `white_player_id=eq.${user.id}`,
+  //     }, (payload) => {
+  //       setInQueue(false);
+  //       console.log("Macth")
+  //       console.log(payload.new.url_hash)
+  //       // window.location.href = `/match/${payload.new.url_hash}`;
+  //     })
+  //     .subscribe();
 
-    const channelBlack = supabase
-      .channel('match_black')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'matches',
-        filter: `black_player_id=eq.${user.id}`,
-      }, (payload) => {
-        setInQueue(false);
-        console.log("Macth")
-        console.log(payload.new.url_hash)
-        // window.location.href = `/match/${payload.new.url_hash}`;
-      })
-      .subscribe();
+  //   const channelBlack = supabase
+  //     .channel('match_black')
+  //     .on('postgres_changes', {
+  //       event: 'INSERT',
+  //       schema: 'public',
+  //       table: 'matches',
+  //       filter: `black_player_id=eq.${user.id}`,
+  //     }, (payload) => {
+  //       setInQueue(false);
+  //       console.log("Macth")
+  //       console.log(payload.new.url_hash)
+  //       // window.location.href = `/match/${payload.new.url_hash}`;
+  //     })
+  //     .subscribe();
 
-    return () => {
-      supabase.removeChannel(channelWhite);
-      supabase.removeChannel(channelBlack);
-    };
-  }, [user]);
+  //   return () => {
+  //     supabase.removeChannel(channelWhite);
+  //     supabase.removeChannel(channelBlack);
+  //   };
+  // }, [user]);
 
   useEffect(() => {
     if (!user || !inQueue) return;
