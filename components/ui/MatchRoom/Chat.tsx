@@ -64,7 +64,7 @@ export default function MatchRoomChat({ matchId }: Props) {
   }
 
   return (
-    <div className="col-span-3 space-y-4 bg-zinc-800 rounded-lg p-4 overflow-y-auto h-fit">
+    <div className="w-full space-y-4 bg-zinc-800 rounded-lg p-4 overflow-y-auto h-fit">
       <h2 className="text-lg font-semibold mb-2">Chat</h2>
       <div className="h-40 overflow-y-auto bg-zinc-900 p-2 rounded mb-2">
         {messages.map((msg, i) => (

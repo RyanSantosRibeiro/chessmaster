@@ -1,180 +1,147 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { Chessboard } from 'react-chessboard';
 import { createClient } from '@/utils/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Chess } from 'chess.js';
-import { Chessboard } from 'react-chessboard';
 import { useMatch } from '@/contexts/MatchContext';
+import { Chess } from 'chess.js';
 
-type Props = {
-  matchCode: string;
-};
-
-export default function GameRoom({ matchCode }: Props) {
+export default function GameRoom() {
   const supabase = createClient();
   const { user } = useAuth();
-  const { match, status, sessionKey, playerColor, isMyTurn, pauseGame, drawGame, resumeGame, setIsMyTurn } = useMatch();
-  const matchId = match?.id || null;
-  
 
-  const [game, setGame] = useState(new Chess());
-  
-  
-  const [opponentOnline, setOpponentOnline] = useState(true);
+  const {
+    game,
+    setGame,
+    matchId,
+    setMatchId,
+    playerColor,
+    setPlayerColor,
+    isMyTurn,
+    setIsMyTurn,
+    setDisconnected,
+    pauseGame,
+    resumeGame,
+    endGameAsDraw,
+    updateMoveHistory,
+    status
+  } = useMatch();
 
-  const gameRef = useRef<Chess>(game);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if(!match) return;
-    const sessionState = sessionStorage.getItem(sessionKey);
-        if (sessionState) {
-          try {
-            const parsed = JSON.parse(sessionState);
-            const localGame = new Chess();
-            localGame.load(parsed.fen);
-            setGame(localGame);
-          } catch {
-            // Fallback: usa estado do Supabase
-            if (match.fen) {
-              const g = new Chess();
-              g.load(match.fen);
-              setGame(g);
-            }
-          }
-        } else if (match.fen) {
-          const g = new Chess();
-          g.load(match.fen);
-          setGame(g);
-        }
-  }, [user, match]);
-
-  
+  const gameRef = useRef(game);
 
   useEffect(() => {
     gameRef.current = game;
   }, [game]);
 
-  // // 2. Subscreve aos movimentos
-  // useEffect(() => {
-  //   if (!matchId || !user) return;
+  // 1. Fetch match
+  useEffect(() => {
+    if (!user) return;
 
-  //   const channel = supabase
-  //     .channel('match_moves')
-  //     .on(
-  //       'postgres_changes',
-  //       {
-  //         event: 'INSERT',
-  //         schema: 'public',
-  //         table: 'match_moves',
-  //         filter: `match_id=eq.${matchId}`,
-  //       },
-  //       (payload) => {
-  //         const move = payload.new.move;
-  //         const sender = payload.new.sender;
+    const fetchMatch = async () => {
+      const { data: match, error } = await supabase
+        .from('matches')
+        .select('*')
+        .eq('url_hash', location.pathname.split('/').pop())
+        .single();
 
-  //         if (sender !== user.id) {
-  //           const newGame = new Chess(gameRef.current.fen());
-  //           newGame.move({
-  //             from: move.slice(0, 2),
-  //             to: move.slice(2, 4),
-  //             promotion: 'q',
-  //           });
-  //           setGame(newGame);
-  //           persistGame(newGame);
-  //           setIsMyTurn(true);
-  //         }
-  //       }
-  //     )
-  //     .subscribe();
+      if (!match || error) return;
 
-  //   return () => {
-  //     supabase.removeChannel(channel);
-  //   };
-  // }, [matchId, user]);
+      setMatchId(match.id);
+      const color = match.white_player_id === user.id ? 'white' : 'black';
+      setPlayerColor(color);
 
-  // 3. Subscreve à presença e controla timeout
+      const newGame = new Chess();
+      if (match.fen) newGame.load(match.fen);
+      setGame(newGame);
+
+      setIsMyTurn(color === 'white');
+    };
+
+    fetchMatch();
+  }, [user]);
+
+  // 2. Realtime broadcast and presence
   useEffect(() => {
     if (!matchId || !user) return;
 
-    const presenceChannel = supabase.channel(`presence:${matchId}`, {
+    const channel = supabase.channel(`match-${matchId}`, {
       config: { presence: { key: user.id } },
     });
 
-    presenceChannel
-      .on('presence', { event: 'sync' }, () => {
-        const state = presenceChannel.presenceState();
-        const allPlayers = Object.keys(state || {});
-        const opponentConnected = allPlayers.some((id) => id !== user.id);
-        console.log({opponentConnected, allPlayers})
-        setOpponentOnline(opponentConnected);
-
-        if (!opponentConnected) {
-          pauseGameWithTimeout();
-        } else {
-          clearTimeout(timerRef.current!);
+    console.log({broadcast: `match-${matchId}`})
+    channel
+      .on('broadcast', { event: 'new-move' }, ({ payload }) => {
+        console.log("broadcast---> NEW MOVE")
+        const move = payload.move;
+        
+        try {
+          const newGame = new Chess(gameRef.current.fen());
+          newGame.move({ from: move.slice(0, 2), to: move.slice(2, 4), promotion: 'q' });
+          setGame(newGame);
+          setIsMyTurn(true);
+          updateMoveHistory(move);
+        } catch (error) {
+          console.log(error)
+        }
+      })
+      .on('presence', { event: 'leave' }, ({ key }) => {
+        console.log("broadcast---> LEAVY")
+        if (key !== user.id) {
+          setDisconnected(true);
+          pauseGame();
+        }
+      })
+      .on('presence', { event: 'join' }, ({ key }) => {
+        console.log("broadcast---> JOIN")
+        if (key !== user.id) {
+          setDisconnected(false);
           resumeGame();
         }
       })
-      .subscribe(async () => {
-        await presenceChannel.track({});
-      });
+      .subscribe();
 
     return () => {
-      presenceChannel.unsubscribe();
+      supabase.removeChannel(channel);
     };
-  }, [match, user]);
+  }, [matchId, user]);
 
-  const pauseGameWithTimeout = async () => {
-    if (status === 'paused') return;
-
-    pauseGame()
-    await supabase.from('matches').update({ status: 'paused' }).eq('id', matchId);
-
-    timerRef.current = setTimeout(async () => {
-      drawGame()
-      await supabase.from('matches').update({
-        status: 'draw',
-        pgn: gameRef.current.pgn(),
-      }).eq('id', matchId);
-      sessionStorage.removeItem(sessionKey);
-    }, 45000);
-  };
-
-  
-
-  // 4. Função de persistência híbrida (local + Supabase)
-  const persistGame = async (g: Chess) => {
-    const data = {
-      fen: g.fen(),
-      pgn: g.pgn(),
-    };
-    sessionStorage.setItem(sessionKey, JSON.stringify(data));
-
-    await supabase.from('matches').update(data).eq('id', matchId);
-  };
-
-  // 5. Movimentação
+  // 3. Make move
   const makeMove = async (source: string, target: string) => {
-    if (!isMyTurn || !playerColor || !matchId || status !== 'in_progress') return false;
+    if (!isMyTurn || !matchId || !playerColor) return false;
 
-    const newGame = new Chess(game.fen());
-    const move = newGame.move({ from: source, to: target, promotion: 'q' });
+    
 
-    if (move) {
-      setGame(newGame);
-      setIsMyTurn(false);
-      await persistGame(newGame);
-
-      await supabase.from('match_moves').insert({
-        match_id: matchId,
-        move: source + target,
-        sender: user.id,
-      });
-
-      return true;
+    try {
+      const newGame = new Chess(game.fen());
+      const move = newGame.move({ from: source, to: target, promotion: 'q' });
+      if (move) {
+        setGame(newGame);
+        setIsMyTurn(false);
+        updateMoveHistory(source + target);
+  
+        sessionStorage.setItem(`match-${matchId}-fen`, newGame.fen());
+        sessionStorage.setItem(`match-${matchId}-history`, JSON.stringify(newGame.history()));
+  
+        console.log({broadcast: "send-new-move"})
+        await supabase
+          .from('matches')
+          .update({ fen: newGame.fen() })
+          .eq('id', matchId);
+  
+        await supabase.channel(`match-${matchId}`).send({
+          type: 'broadcast',
+          event: 'new-move',
+          payload: { move: source + target },
+        });
+  
+        return true;
+      }
+    } catch (error) {
+      console.log(error)
     }
+
+   
 
     return false;
   };
@@ -187,7 +154,7 @@ export default function GameRoom({ matchCode }: Props) {
             position={game.fen()}
             boardOrientation={playerColor}
             onPieceDrop={makeMove}
-            arePiecesDraggable={isMyTurn && status === 'in_progress'}
+            arePiecesDraggable={isMyTurn}
             animationDuration={200}
           />
         )}
