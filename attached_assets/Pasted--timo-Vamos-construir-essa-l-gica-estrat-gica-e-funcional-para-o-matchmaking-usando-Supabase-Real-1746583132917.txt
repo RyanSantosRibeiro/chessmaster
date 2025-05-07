@@ -1,0 +1,126 @@
+Ótimo. Vamos construir essa lógica estratégica e funcional para o matchmaking usando **Supabase Realtime**.
+
+## 🎯 Objetivo:
+
+Permitir que **dois jogadores com o mesmo ticket e rank semelhante** sejam **juntados automaticamente em um lobby** usando Supabase Realtime.
+
+---
+
+## 📦 Estrutura do banco necessária
+
+### Tabela: `queue` (fila de busca por partida)
+
+```sql
+id (uuid) - PK
+user_id (uuid) - FK para o jogador
+ticket (decimal) - valor do ticket (ex: 5.00, 10.00)
+rank (int) - ranking atual
+status (enum) - 'searching' | 'matched'
+created_at (timestamp)
+```
+
+### Tabela: `lobbies`
+
+```sql
+id (uuid) - PK
+player1_id (uuid)
+player2_id (uuid)
+ticket (decimal)
+status (enum) - 'waiting' | 'active' | 'finished'
+created_at (timestamp)
+```
+
+---
+
+## 🔁 Fluxo Realtime
+
+1. **Jogador clica para buscar partida (ex: ticket de R\$10)**
+   → Insere um registro na `queue` com status `searching`.
+
+2. **Supabase Realtime escuta novos registros em `queue`**
+   → Um serviço ou listener (`supabase.channel`) detecta novas entradas com status `searching`.
+
+3. **Matchmaking lógico (em client ou edge function):**
+
+   * Quando um novo jogador entra na fila, o sistema:
+
+     * Busca outro jogador na fila com:
+
+       * Mesmo `ticket`
+       * `rank` dentro de uma margem (ex: ±200 pontos)
+       * `status = searching`
+       * `user_id != current_user_id`
+   * Se encontrar:
+
+     * Cria um `lobby`
+     * Atualiza ambos os jogadores na `queue` para `matched`
+     * Remove ou arquiva a entrada da fila
+
+---
+
+## ⚙️ Exemplo prático (client-side + Realtime)
+
+### 1. **Insere entrada na fila**
+
+```ts
+await supabase.from("queue").insert({
+  user_id: user.id,
+  ticket: 10.0,
+  rank: profile.rank,
+  status: "searching"
+})
+```
+
+### 2. **Escuta entradas novas no Supabase Realtime**
+
+```ts
+const channel = supabase
+  .channel("matchmaking")
+  .on("postgres_changes", {
+    event: "INSERT",
+    schema: "public",
+    table: "queue",
+    filter: 'status=eq.searching'
+  }, async (payload) => {
+    const newPlayer = payload.new
+
+    // Buscar outro jogador compatível
+    const { data: potentialOpponents } = await supabase
+      .from("queue")
+      .select("*")
+      .eq("ticket", newPlayer.ticket)
+      .eq("status", "searching")
+      .neq("user_id", newPlayer.user_id)
+
+    const opponent = potentialOpponents.find(p => {
+      return Math.abs(p.rank - newPlayer.rank) <= 200
+    })
+
+    if (opponent) {
+      // Criar lobby
+      await supabase.from("lobbies").insert({
+        player1_id: newPlayer.user_id,
+        player2_id: opponent.user_id,
+        ticket: newPlayer.ticket,
+        status: "waiting"
+      })
+
+      // Marcar jogadores como matched
+      await supabase.from("queue").update({ status: "matched" }).eq("id", newPlayer.id)
+      await supabase.from("queue").update({ status: "matched" }).eq("id", opponent.id)
+    }
+  })
+  .subscribe()
+```
+
+---
+
+## 🧠 Considerações estratégicas
+
+* **Segurança**: Pode usar Supabase Edge Functions para controlar criação de lobbies e evitar exploits no client.
+* **Timeout de fila**: Jogadores podem ser removidos automaticamente da fila após X minutos se não forem pareados.
+* **Travas de concorrência**: Lógica de atualização com verificações para evitar que um jogador entre em múltiplos lobbies.
+
+---
+
+Quer que eu implemente essa lógica como uma função real (hook ou função utilitária) no seu projeto com Next.js + Supabase?
