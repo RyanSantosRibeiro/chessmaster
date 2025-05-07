@@ -16,85 +16,58 @@ type QueueEntry = {
 
 export default function QueueManager() {
   const [inQueue, setInQueue] = useState(false);
-  const { user } = useAuth();
+  const { user } = useAuth(); // Certifique-se de que `profile` contém rank_points
   const supabase = createClient();
 
-  const generateMatchId = () => {
-    return Math.random().toString(36).substring(2, 8);
-  };
+  const generateMatchId = () => Math.random().toString(36).substring(2, 8);
 
-  const findMatch = async (amount: number): Promise<string | null> => {
-    if (!user) return null;
+  const findMatch = async (amount: number): Promise<void> => {
+    if (!user || !user) return;
 
-    // Primeiro procura por um oponente compatível
     const { data: potentialMatch } = await supabase
       .from('queue')
       .select('*')
       .eq('status', 'searching')
       .eq('ticket_amount_cents', amount * 100)
       .neq('user_id', user.id)
-      .filter('rank_points', 'gte', 800) // rank - 200
-      .filter('rank_points', 'lte', 1200) // rank + 200
+      .gte('rank_points', user.rank_points - 200)
+      .lte('rank_points', user.rank_points + 200)
       .maybeSingle();
 
     if (potentialMatch) {
       const matchId = generateMatchId();
-      // Cria a partida
-      const { data: match, error: matchError } = await supabase
-        .from('matches')
-        .insert({
-          url_hash: matchId,
-          white_player_id: user.id,
-          black_player_id: potentialMatch.user_id,
-          ticket_amount_cents: amount * 100,
-          status: 'in_progress'
-        })
-        .select()
-        .single();
+      await supabase.from('matches').insert({
+        url_hash: matchId,
+        white_player_id: user.id,
+        black_player_id: potentialMatch.user_id,
+        ticket_amount_cents: amount * 100,
+        status: 'in_progress',
+      });
 
-      if (matchError) {
-        console.error('Error creating match:', matchError);
-        return null;
-      }
-
-      // Remove ambos os jogadores da fila
       await supabase
         .from('queue')
         .delete()
         .in('user_id', [user.id, potentialMatch.user_id]);
 
-      return matchId;
+      return;
     }
 
-    // Se não encontrou oponente, cria uma nova entrada na fila
-    const { data: newEntry, error: queueError } = await supabase
-      .from('queue')
-      .insert({
-        user_id: user.id,
-        ticket_amount_cents: amount * 100,
-        status: 'searching'
-      })
-      .select()
-      .single();
+    // Inserir jogador na fila
+    await supabase.from('queue').insert({
+      user_id: user.id,
+      ticket_amount_cents: amount * 100,
+      rank_points: user.rank_points,
+      status: 'searching',
+    });
 
-    if (queueError) {
-      console.error('Error joining queue:', queueError);
-      return null;
-    }
-
-    return null;
+    return;
   };
 
   const joinQueue = async (amount: number) => {
     if (!user) return;
 
     setInQueue(true);
-    const matchId = await findMatch(amount);
-
-    if (matchId) {
-      // Redirecionar para a partida
-      window.location.href = `/match/${matchId}`;
-    }
+    await findMatch(amount);
   };
 
   const leaveQueue = async () => {
@@ -109,31 +82,42 @@ export default function QueueManager() {
     setInQueue(false);
   };
 
-  const cleanupMatchmaking = () => {
-    //Clean up any existing matchmaking subscriptions here if needed.  This is a placeholder.
-  };
-
   useEffect(() => {
     if (!user) return;
 
-    const channel = supabase
-      .channel('queue_updates')
+    const channelWhite = supabase
+      .channel('match_white')
       .on('postgres_changes', {
-        event: '*',
+        event: 'INSERT',
         schema: 'public',
         table: 'matches',
-        filter: `white_player_id=eq.${user.id},black_player_id=eq.${user.id}`
+        filter: `white_player_id=eq.${user.id}`,
       }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          setInQueue(false);
-          window.location.href = `/match/${payload.new.id}`;
-        }
+        setInQueue(false);
+        console.log("Macth")
+        console.log(payload.new.url_hash)
+        // window.location.href = `/match/${payload.new.url_hash}`;
+      })
+      .subscribe();
+
+    const channelBlack = supabase
+      .channel('match_black')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'matches',
+        filter: `black_player_id=eq.${user.id}`,
+      }, (payload) => {
+        setInQueue(false);
+        console.log("Macth")
+        console.log(payload.new.url_hash)
+        // window.location.href = `/match/${payload.new.url_hash}`;
       })
       .subscribe();
 
     return () => {
-      cleanupMatchmaking();
-      supabase.removeChannel(channel);
+      supabase.removeChannel(channelWhite);
+      supabase.removeChannel(channelBlack);
     };
   }, [user]);
 
@@ -146,11 +130,10 @@ export default function QueueManager() {
         event: 'INSERT',
         schema: 'public',
         table: 'queue',
-        filter: 'status=eq.searching'
+        filter: 'status=eq.searching',
       }, async (payload) => {
         const newPlayer = payload.new;
 
-        // Buscar outro jogador compatível
         const { data: potentialOpponents } = await supabase
           .from('queue')
           .select('*')
@@ -158,33 +141,36 @@ export default function QueueManager() {
           .eq('status', 'searching')
           .neq('user_id', newPlayer.user_id);
 
-
-        const opponent = potentialOpponents.find(p => {
-          return Math.abs(p.rank_points - newPlayer.rank_points) <= 200;
-        });
+        const opponent = potentialOpponents.find(
+          (p) =>
+            Math.abs(p.rank_points - newPlayer.rank_points) <= 200
+        );
 
         if (opponent) {
-          // Criar lobby (replace with your actual lobby creation logic)
           const matchId = generateMatchId();
+
           await supabase.from('matches').insert({
             url_hash: matchId,
             white_player_id: newPlayer.user_id,
             black_player_id: opponent.user_id,
             ticket_amount_cents: newPlayer.ticket_amount_cents,
-            status: 'in_progress'
+            status: 'in_progress',
           });
 
-          // Marcar jogadores como matched
-          await supabase.from('queue').update({ status: 'matched' }).eq('id', newPlayer.id);
-          await supabase.from('queue').update({ status: 'matched' }).eq('id', opponent.id);
-          window.location.href = `/match/${matchId}`;
+          await supabase
+            .from('queue')
+            .update({ status: 'matched' })
+            .eq('id', newPlayer.id);
+          await supabase
+            .from('queue')
+            .update({ status: 'matched' })
+            .eq('id', opponent.id);
         }
       })
       .subscribe();
 
     return () => supabase.removeChannel(matchmakingChannel);
-  }, [user, inQueue, supabase]);
-
+  }, [user, inQueue]);
 
   return (
     <div className="space-y-4">
