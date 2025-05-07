@@ -44,7 +44,7 @@ export default function QueueManager() {
       const { data: match, error: matchError } = await supabase
         .from('matches')
         .insert({
-          id: matchId,
+          url_hash : matchId,
           white_player_id: user.id,
           black_player_id: potentialMatch.user_id,
           ticket_amount_cents: amount * 100,
