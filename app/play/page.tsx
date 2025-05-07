@@ -6,7 +6,6 @@ import Link from 'next/link';
 
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 
 const LobbyList = dynamic(() => import('@/components/ui/Lobby/LobbyList'), {
   ssr: false
