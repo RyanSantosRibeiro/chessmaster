@@ -146,10 +146,14 @@ export default function QueueManager() {
             const matchId = generateMatchId();
             
             try {
+              // Determina quem será white_player baseado no rank
+              const white_player_id = user.rank_points <= newPlayer.rank_points ? user.id : newPlayer.user_id;
+              const black_player_id = user.rank_points <= newPlayer.rank_points ? newPlayer.user_id : user.id;
+              
               await supabase.from('matches').insert({
                 url_hash: matchId,
-                white_player_id: user.id,
-                black_player_id: newPlayer.user_id,
+                white_player_id,
+                black_player_id,
                 ticket_amount_cents: newPlayer.ticket_amount_cents,
                 status: 'in_progress'
               });
