@@ -30,10 +30,24 @@ export const getProducts = cache(async (supabase: SupabaseClient) => {
   return products;
 });
 
+export const getMatch = cache(async (supabase: SupabaseClient) => {
+  const { data: match, error } = await supabase
+    .from('matches')
+    .select(`*,
+      white_player:profile!white_player_id(*),
+      black_player:profile!black_player_id(*)`
+    )
+    .eq('url_hash', "vemr")
+    .single()
+  return  match
+;
+});
+
 export const getUserDetails = cache(async (supabase: SupabaseClient) => {
-  const { data: userDetails } = await supabase
-    .from('users')
+  const { data: profile } = await supabase
+    .from('profile')
     .select('*')
+    .eq('active', true)
     .single();
-  return userDetails;
+  return profile;
 });

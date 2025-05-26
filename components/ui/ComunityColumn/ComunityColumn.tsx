@@ -4,42 +4,42 @@ import { Suspense, useState } from 'react';
 import { useMatch } from '@/contexts/MatchContext';
 import MatchRoomChat from '../MatchRoom/Chat';
 import { useAuth } from '@/contexts/AuthContext';
-import Controls from '../Controls/Controls';
-import StatisticColumn from './Statistic';
-import { MatchmakingButtons } from '../Queue/QueueManagerList';
+import QueueManager from '../Queue/QueueManager';
 
 type Props = {
   matchCode?: string;
 };
 
-export default function DetailsColumn({ matchCode }: Props) {
+export default function ComunityColumn({ matchCode }: Props) {
   const { game, moveHistory, playerColor } = useMatch();
-  const [activeTab, setActiveTab] = useState('newMatch');
+  const [activeTab, setActiveTab] = useState('summary');
   const { user } = useAuth()
 
   return (
     <div className="card bg-base-100 w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden">
       <div className="tabs tabs-boxed flex flex-nowrap">
-        <a className={`p-2 w-full tab ${activeTab === 'statistic' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
-          onClick={() => setActiveTab('match')}
+        {matchCode && <a
+          className={`p-2 w-full tab ${activeTab === 'summary' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
+          onClick={() => setActiveTab('summary')}
         >
-          Match
-        </a>
+          Resumo
+        </a>}
         <a
           className={`p-2 w-full tab ${activeTab === 'history' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
           onClick={() => setActiveTab('history')}
         >
           Lances
         </a>
-        <a className={`p-2 w-full tab ${activeTab === 'newMatch' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
-          onClick={() => setActiveTab('newMatch')}
+        <a
+          className={`p-2 w-full tab ${activeTab === 'chat' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
+          onClick={() => setActiveTab('chat')}
         >
-          New Match
+          Chat
         </a>
       </div>
 
       <div className="card-body flex-1 overflow-y-auto p-4 rounded-[10px_10px_0_0] bg-base-100">
-        {activeTab === 'summary' && (
+        {activeTab === 'summary' && game ? (
           <div className="text-sm text-white space-y-2">
             <p><span className="font-semibold">Cor:</span> {playerColor === 'white' ? 'Branco' : 'Preto'}</p>
             <p><span className="font-semibold">Turno Atual:</span> {game.turn() === 'w' ? 'Branco' : 'Preto'}</p>
@@ -47,11 +47,8 @@ export default function DetailsColumn({ matchCode }: Props) {
             <p><span className="font-semibold">Chequemate:</span> {game.isCheckmate() ? 'Sim' : 'Não'}</p>
             <p><span className="font-semibold">Empate:</span> {game.isDraw() ? 'Sim' : 'Não'}</p>
           </div>
-        )}
+        ): <></>}
 
-        {activeTab === 'match' && (
-          <StatisticColumn />
-        )}
         {activeTab === 'history' && (
           <div className="text-white text-sm">
             {moveHistory.length === 0 ? (
@@ -74,8 +71,7 @@ export default function DetailsColumn({ matchCode }: Props) {
                   <h2 className="text-xl font-bold mb-2">Welcome, {user.email}</h2>
                   <p className="text-zinc-400 mb-4">Choose your game:</p>
                   <Suspense fallback={<div>Loading queue manager...</div>}>
-                    {/* <QueueManager /> */}
-                    <MatchmakingButtons />
+                    <QueueManager />
                   </Suspense>
                 </>
               ) : (
@@ -89,7 +85,7 @@ export default function DetailsColumn({ matchCode }: Props) {
           </div>
         )}
       </div>
-      <div className="h-auto flex flex-col">
+      <div className="h-aut flex flex-col">
             <MatchRoomChat matchId={matchCode} />
       </div>
     </div>

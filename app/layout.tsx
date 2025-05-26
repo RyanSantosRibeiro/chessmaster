@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
-import Footer from '@/components/ui/Footer';
-import Navbar from '@/components/ui/Navbar';
 import { Toaster } from '@/components/ui/Toasts/toaster';
 import { PropsWithChildren, Suspense } from 'react';
 import { getURL } from '@/utils/helpers';
 import 'styles/main.css';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { createClient } from '@/utils/supabase/server';
+import { getUser } from '@/utils/supabase/queries';
+import Navlinks from '@/components/ui/Navbar/Navlinks';
 
 const title = 'Next.js Subscription Starter';
 const description = 'Brought to you by Vercel, Stripe, and Supabase.';
@@ -21,12 +22,16 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: PropsWithChildren) {
+  const supabase = createClient()
+  const user = await getUser(supabase)
   return (
-    <html lang="en">
-      <body className="bg-nivel-1">
-        <AuthProvider>
+    <html lang="en" data-theme="dark" className="dark">
+      <body className="bg-base-200">
+        <AuthProvider  initialUser={user}>
           <div className='flex w-full h-screen'>
-              <Navbar />
+               <div className="sticky top-0 left-0 bg-[#13181b] z-40 transition-all duration-150 h-full w-full max-w-[150px] p-2">
+                      <Navlinks user={user} />
+                    </div>
               <main
                 id="skip"
                 className="min-h-screen w-full flex flex-col items-center justify-center overflow-hidden"

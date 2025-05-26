@@ -1,71 +1,74 @@
+'use client'
 
-'use client';
-
-import { createContext, useContext, useEffect, useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
-import { User } from '@supabase/supabase-js';
+import { createContext, useContext, useEffect, useState } from 'react'
+import { createClient } from '@/utils/supabase/client'
+import { User } from '@supabase/supabase-js'
+import { getUserDetails } from '@/utils/supabase/queries'
 
 type AuthContextType = {
-  user: User | null;
-  loading: boolean;
-};
+  user: User | null
+  profile: any | null
+  loading: boolean
+}
 
-const AuthContext = createContext<AuthContextType>({ user: null, loading: true });
+const AuthContext = createContext<AuthContextType>({ user: null, loading: true })
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+export function AuthProvider({
+  children,
+  initialUser = null,
+}: {
+  children: React.ReactNode
+  initialUser?: User | null
+}) {
+  const [user, setUser] = useState<User | null>(initialUser)
+  const [profile, setProfile] = useState<any | null>(null)
+  const [loading, setLoading] = useState(!initialUser)
+  const supabase = createClient()
 
-  useEffect(() => {
-    console.log("Iniciando Auth")
-    async function getUserDetails(userId: string) {
-      
-      const { data } = await supabase
-        .from('users')
+  const getProfile = async (userId: string) => {
+      try {
+        const { data: profile, error } = await supabase
+        .from('profile')
         .select('*')
         .eq('id', userId)
         .single();
-        console.log({getUserDetail: userId, data})
-      return data;
 
+        if(error) return;
+
+        setProfile(profile);
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    useEffect(() => {
+      if(user?.id)
+          getProfile(user?.id)
+    }, [user])
+
+  useEffect(() => {
+    if (!initialUser) {
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        setUser(user)
+        setLoading(false)
+      })
+
+      
     }
 
-    // Check active sessions and sets the user
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      console.log({session})
-      if (session?.user) {
-        const userDetails = await getUserDetails(session.user.id);
-        setUser({ ...session.user, ...userDetails });
-      } else {
-        console.log("Cant load user!")
-        setUser(null);
-      }
-      setLoading(false);
-    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
 
-    // Listen for changes on auth state 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        const userDetails = await getUserDetails(session.user.id);
-        setUser({ ...session.user, ...userDetails });
-      } else {
-        console.log("Cant load user!")
-        setUser(null);
-      }
-      setLoading(false);
-    });
-
-    console.log({AuthSubscription: subscription})
-
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      listener.subscription.unsubscribe()
+    }
+  }, [])
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, profile, loading }}>
       {children}
     </AuthContext.Provider>
-  );
+  )
 }
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext)

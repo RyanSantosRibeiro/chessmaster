@@ -20,7 +20,7 @@ export default function QueueManager() {
   const { user } = useAuth(); // Certifique-se de que `profile` contém rank_points
   const supabase = createClient();
 
-  const generateMatchId = () => Math.random().toString(36).substring(2, 8);
+  const generateMatchId = () => Math.random().toString(36).substring(2, 4);
 
   const findMatch = async (amount: number): Promise<void> => {
     if (!user) return;
@@ -46,7 +46,7 @@ export default function QueueManager() {
         ticket_amount_cents: amount,
         status: 'in_progress',
       });
-
+      console.log("Partida encontrada")
       // Remover jogadores da fila
       console.log("Removendo da fila")
       await supabase.from('queue').delete().eq('user_id', user.id);

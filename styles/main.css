@@ -18,6 +18,7 @@
 
 .bg-gray-700 {
   background-color: #333333;
+  background-color: rgba(34, 197, 94, 0.13);
 }
 
 @tailwind base;
@@ -31,7 +32,7 @@
 }
 
 *:focus:not(ol) {
-  @apply outline-none ring-2 ring-pink-500 ring-opacity-50;
+  @apply outline-none ring-2  ring-opacity-50;
 }
 
 html {
@@ -87,3 +88,106 @@ p a {
 .bg-nivel-2 {
   background-color: #13181b;
 }
+
+.bg-nivel-3 {
+  background-color: #0f1315;
+}
+
+.gameOver {
+  animation: gameOver 2s forwards;
+  /* background: radial-gradient(circle, transparent 30%, #000); */
+}
+
+.gameWin {
+  animation: gameWin 2s forwards;
+  /* background: radial-gradient(circle, #31008000 0%, #4b00b365 100%, #6a00ffc0 180%); */
+
+  .card-title {
+    color: #fcb700;
+    font-size: 80px;
+    line-height: 96px;
+  }
+}
+
+@keyframes gameOver {
+  0% {
+    background: radial-gradient(circle, transparent 30%, #000 150%);
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    background: radial-gradient(circle, transparent 0%, #000 114%);
+  }
+}
+
+@keyframes gameWin {
+  0% {
+    background: radial-gradient(circle, transparent 30%, #6a00ff 150%);
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    background: radial-gradient(circle, transparent 0%, #6a00ff 114%);
+  }
+}
+
+@keyframes winnerGlow {
+  0% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.9), 0 0 100px #ff0;
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.winnerEffect {
+  background: radial-gradient(circle at center, #4b00b3 0%, #19002e 100%);
+  animation: winnerGlow 2s ease-out forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.winnerEffect::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: url('/confetti.gif') repeat;
+  opacity: 0.6;
+  z-index: 0;
+  animation: spinConfetti 10s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes spinConfetti {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* .gameWin .card-title  {
+  font-size: 3rem;
+  background: linear-gradient(90deg, #ffea00, #ffb800, #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  text-shadow: 0 0 10px #fff000, 0 0 20px #ff9900, 0 0 30px #ffd700;
+  animation: pulseGlow 2s infinite alternate;
+} */
+
+@keyframes pulseGlow {
+  from {
+    text-shadow: 0 0 10px #fff000, 0 0 20px #ff9900;
+  }
+  to {
+    text-shadow: 0 0 20px #fff000, 0 0 40px #ff9900;
+  }
+}
+
+
+

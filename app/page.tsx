@@ -5,6 +5,8 @@ import {
   getSubscription,
   getUser
 } from '@/utils/supabase/queries';
+import { AuthProvider } from '@/contexts/AuthContext';
+import Navbar from '@/components/ui/Navbar';
 
 export default async function PricingPage() {
   const supabase = createClient();
@@ -15,10 +17,15 @@ export default async function PricingPage() {
   ]);
 
   return (
-    <Pricing
-      user={user}
-      products={products ?? []}
-      subscription={subscription}
-    />
+    <AuthProvider>
+      <div className='flex w-full h-screen'>
+              <Navbar />
+              <main
+                id="skip"
+                className="min-h-screen w-full flex flex-col items-center justify-center overflow-hidden"
+              >
+              </main>
+          </div>
+    </AuthProvider>
   );
 }
