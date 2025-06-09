@@ -50,7 +50,7 @@ const playerIds = [matchData?.match?.white_player_id, matchData?.match?.black_pl
   
   useEffect(() => {
     console.log({matchData, match, user})
-    if(!matchData || !user) return;
+    if((!matchData || !user) || game) return;
     setPlayerColor(matchData?.match?.white_player_id == user.id ? "w" : "b")
     setMatch(matchData.match);
     setOpponent(matchData.match.black_player)
@@ -133,7 +133,7 @@ const playerIds = [matchData?.match?.white_player_id, matchData?.match?.black_pl
       <div className="w-full flex items-start justify-between">
         <PlayerCard
           time={playerColor == "w" ? time.black : time.white}
-          name={opponent.full_name || "Jhon jones"}
+          name={opponent?.full_name || "Jhon jones"}
           trophies={opponent?.rank_points} 
           isTurn={!isPlayerTurn ? "Turno" : null}
         />

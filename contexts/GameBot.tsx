@@ -30,6 +30,7 @@ function useChessVsBotProvider() {
   const [fen, setFen] = useState(game.fen());
   const [visualPosition, setVisualPosition] = useState(null); 
   const [level, setLevel] = useState(3);
+  const [history, setHistory] = useState([]);
   const [isPaused, setIsPaused] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
   const [firstMove, setFirstMove] = useState(false);
@@ -74,6 +75,7 @@ function useChessVsBotProvider() {
 
   // Timer
   useEffect(() => {
+    console.log(game.history({ verbose: true }))
     if (isPaused || game.isGameOver() || winner || !firstMove) return;
     timerRef.current = setInterval(() => {
       setTime((prev) => {
@@ -183,7 +185,12 @@ function useChessVsBotProvider() {
 
       const result = game.move(move);
       if (result === null) return false; // movimento ilegal
-      setGame(new Chess(game.fen())); // atualiza o estado do jogo
+      const newGame = new Chess(game.fen())
+      const hist = game.history()
+      console.log({hist, history})
+      // setHistory(history=>[...history, hist[0]])
+
+      setGame(game); // atualiza o estado do jogo
       setFen(game.fen());
       requestBotMove();
       return true;
@@ -198,7 +205,7 @@ function useChessVsBotProvider() {
     setTimeout(() => {
       stockfish.current?.postMessage(`position fen ${game.fen()}`);
       stockfish.current?.postMessage('go depth 12');
-    }, 8000);
+    }, 3000);
   };
 
   useEffect(() => {
@@ -267,7 +274,7 @@ function useChessVsBotProvider() {
     winner,
     playerColor,
     markedSquares, setMarkedSquares,onSquareRightClick,
-    moveHistory: game.history({ verbose: true }),
+    moveHistory: game.history({verbose: true}),
     onPieceDragged,
     possibleMoves,
     movePreview,

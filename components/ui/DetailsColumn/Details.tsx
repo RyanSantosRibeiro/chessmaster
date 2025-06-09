@@ -1,21 +1,24 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useMatch } from '@/contexts/MatchContext';
 import MatchRoomChat from '../MatchRoom/Chat';
 import { useAuth } from '@/contexts/AuthContext';
 import Controls from '../Controls/Controls';
 import StatisticColumn from './Statistic';
 import { MatchmakingButtons } from '../Queue/QueueManagerList';
+import { useChessVsBot } from '@/contexts/GameBot';
 
 type Props = {
   matchCode?: string;
 };
 
 export default function DetailsColumn({ matchCode }: Props) {
-  const { game, moveHistory, playerColor } = useMatch();
+  let { game, playerColor } = useMatch();
+  
   const [activeTab, setActiveTab] = useState('newMatch');
   const { user } = useAuth()
+
 
   return (
     <div className="card bg-base-100 w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden">
@@ -31,11 +34,13 @@ export default function DetailsColumn({ matchCode }: Props) {
         >
           Lances
         </a>
-        <a className={`p-2 w-full tab ${activeTab === 'newMatch' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
+        {!game && (
+          <a className={`p-2 w-full tab ${activeTab === 'newMatch' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
           onClick={() => setActiveTab('newMatch')}
         >
           New Match
         </a>
+        )}
       </div>
 
       <div className="card-body flex-1 overflow-y-auto p-4 rounded-[10px_10px_0_0] bg-base-100">
@@ -49,21 +54,8 @@ export default function DetailsColumn({ matchCode }: Props) {
           </div>
         )}
 
-        {activeTab === 'match' && (
-          <StatisticColumn />
-        )}
         {activeTab === 'history' && (
-          <div className="text-white text-sm">
-            {moveHistory.length === 0 ? (
-              <p>Nenhum lance ainda.</p>
-            ) : (
-              <ol className="list-decimal list-inside space-y-1">
-                {moveHistory.map((move, index) => (
-                  <li key={index}>{move}</li>
-                ))}
-              </ol>
-            )}
-          </div>
+          <StatisticColumn />
         )}
 
         {activeTab === 'newMatch' && (

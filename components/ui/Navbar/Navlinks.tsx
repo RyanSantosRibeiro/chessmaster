@@ -28,15 +28,15 @@ export default function Navlinks({ user }: NavlinksProps) {
           <Link href="/play" className={s.link}>
             🚀 Scoreboard
           </Link>
-          <Link href="/play" className={s.link}>
+          <Link href="/play" className={`${s.link} disable`}>
             🏆 Tournaments
           </Link>
-          <Link href="/play" className={s.link}>
+          <Link href="/play" className={`${s.link} disable`}>
             🌎 Friends
           </Link>
           {user && (
             <Link href="/account" className={s.link}>
-              Account
+              👤 Account
             </Link>
           )}
         </nav>
@@ -64,7 +64,7 @@ export default function Navlinks({ user }: NavlinksProps) {
       <div className='flex flex-col gap-2 mt-auto pt-2'>
         <a href='/' className='text-gray-700'>Suport</a>
         <a href='/' className='text-gray-700'>About Us</a>
-        <p className="text-gray-700 text-white text-center text-xs">© 2023 Chess Platform</p>
+        <p className="text-gray-700 text-xs">© 2023 Chess Platform</p>
       </div>
     </div>
   );

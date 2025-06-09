@@ -28,8 +28,8 @@ export const useMatch = () => {
 
 function useMatchProvider() {
   const initialTime = {
-    white: 10, // 5 min
-    black: 10,
+    white: 100, // 5 min
+    black: 100,
   };
   const [match, setMatch] = useState<any | null>(null);
   const [game, setGame] = useState<Chess | null>(null);
