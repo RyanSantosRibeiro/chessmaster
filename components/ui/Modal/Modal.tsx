@@ -1,12 +1,20 @@
+'use client'
 
 import { PropsWithChildren } from 'react';
 
-export default async function Modal({children}:PropsWithChildren) {
+interface Props extends PropsWithChildren {
+  cta: {
+    text: string,
+    type: string
+  }
+}
+
+export default function Modal({children, cta}:Props) {
 
 
   return (
     <div>
-        <button className="btn" onClick={()=>document.getElementById('my_modal_2').showModal()}>open modal</button>
+        <button className={`w-full btn btn-${cta?.type}`} onClick={()=>document.getElementById('my_modal_2').showModal()}>{cta?.text || "open"}</button>
         <dialog id="my_modal_2" className="modal">
         <div className="modal-box">
         {children}

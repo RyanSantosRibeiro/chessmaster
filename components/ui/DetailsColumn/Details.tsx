@@ -8,6 +8,7 @@ import Controls from '../Controls/Controls';
 import StatisticColumn from './Statistic';
 import { MatchmakingButtons } from '../Queue/QueueManagerList';
 import { useChessVsBot } from '@/contexts/GameBot';
+import { createClient } from '@/utils/supabase/client';
 
 type Props = {
   matchCode?: string;
@@ -15,9 +16,26 @@ type Props = {
 
 export default function DetailsColumn({ matchCode }: Props) {
   let { game, playerColor } = useMatch();
+  const supabase = createClient()
   
   const [activeTab, setActiveTab] = useState('newMatch');
-  const { user } = useAuth()
+  const { user } = useAuth();
+
+  const getRank = async (userId: string) => {
+      try {
+        const { data: profile, error } = await supabase
+        .from('profile')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+        if(error) return;
+
+        setProfile(profile);
+      } catch (error) {
+        console.log(error)
+      }
+    }
 
 
   return (
@@ -60,7 +78,7 @@ export default function DetailsColumn({ matchCode }: Props) {
 
         {activeTab === 'newMatch' && (
           <div className="col-span-6 space-y-4">
-            <div className="bg-nivel-2 rounded-lg p-4">
+            <div className="bg-nivel-2 rounded-lg p-4 overflow-hidden">
               {user ? (
                 <>
                   <h2 className="text-xl font-bold mb-2">Welcome, {user.email}</h2>
@@ -75,7 +93,7 @@ export default function DetailsColumn({ matchCode }: Props) {
               )}
             </div>
             <div className="bg-nivel-2 rounded-lg p-4">
-              <h2 className="text-xl font-bold mb-2">🏆 Scoreboard</h2>
+              <h2 className="text-xl font-bold mb-2">🏆 Scoreboard 2</h2>
               <p className="text-zinc-400">Your current position on scoreboard</p>
             </div>
           </div>

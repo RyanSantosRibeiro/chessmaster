@@ -18,7 +18,7 @@ export default async function PricingPage() {
 
   return (
     <AuthProvider>
-      <div className='flex w-full h-screen'>
+      <div className='flex w-screen h-screen'>
               <main
                 id="skip"
                 className="min-h-screen w-full flex flex-col items-center justify-center overflow-hidden"

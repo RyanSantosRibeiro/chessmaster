@@ -79,7 +79,7 @@ export default function ComunityColumn({ matchCode }: Props) {
               )}
             </div>
             <div className="bg-nivel-2 rounded-lg p-4">
-              <h2 className="text-xl font-bold mb-2">🏆 Scoreboard</h2>
+              <h2 className="text-xl font-bold mb-2">🏆 Scoreboard 3</h2>
               <p className="text-zinc-400">Your current position on scoreboard</p>
             </div>
           </div>

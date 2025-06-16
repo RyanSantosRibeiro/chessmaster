@@ -75,7 +75,7 @@ function useChessVsBotProvider() {
 
   // Timer
   useEffect(() => {
-    console.log(game.history({ verbose: true }))
+    console.log("Tickando timer")
     if (isPaused || game.isGameOver() || winner || !firstMove) return;
     timerRef.current = setInterval(() => {
       setTime((prev) => {
@@ -92,7 +92,7 @@ function useChessVsBotProvider() {
       });
     }, 1000);
     return () => clearInterval(timerRef.current!);
-  }, [ isPaused, winner, game]);
+  }, [ isPaused, winner, game,fen]);
 
   useEffect(() => {
     const lastMoves = game.history({ verbose: true }).slice(-2); // pega as últimas jogadas (do bot ou do jogador)

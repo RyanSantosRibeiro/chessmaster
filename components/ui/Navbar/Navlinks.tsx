@@ -7,6 +7,9 @@ import Logo from '@/components/icons/Logo';
 import { usePathname, useRouter } from 'next/navigation';
 import { getRedirectMethod } from '@/utils/auth-helpers/settings';
 import s from './Navbar.module.css';
+import Modal from '../Modal/Modal';
+import WalletInterface from '../AccountForms/Wallet';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavlinksProps {
   user?: any;
@@ -14,6 +17,8 @@ interface NavlinksProps {
 
 export default function Navlinks({ user }: NavlinksProps) {
   const router = getRedirectMethod() === 'client' ? useRouter() : null;
+  const {profile} = useAuth();
+  console.log({profile})
 
   return (
     <div className="relative flex flex-col justify-between py-4 align-center md:py-6 h-full">
@@ -28,12 +33,12 @@ export default function Navlinks({ user }: NavlinksProps) {
           <Link href="/play" className={s.link}>
             🚀 Scoreboard
           </Link>
-          <Link href="/play" className={`${s.link} disable`}>
+          <p className={s.linkDisable}>
             🏆 Tournaments
-          </Link>
-          <Link href="/play" className={`${s.link} disable`}>
+          </p>
+          <p className={s.linkDisable}>
             🌎 Friends
-          </Link>
+          </p>
           {user && (
             <Link href="/account" className={s.link}>
               👤 Account
@@ -43,12 +48,17 @@ export default function Navlinks({ user }: NavlinksProps) {
       </div>
       <div className="flex flex-col justify-end gap-2"> 
         {user ? (
-          <form onSubmit={(e) => handleRequest(e, SignOut, router)}>
-            <input type="hidden" name="pathName" value={usePathname()} />
-            <button type="submit" className="text-gray-700">
-              Sign out
-            </button>
-          </form>
+          <>
+            <Modal cta={{text: `${profile?.cash || ""} Aurion`,type: "primary"}}>
+                <WalletInterface/>
+            </Modal>
+            <form onSubmit={(e) => handleRequest(e, SignOut, router)}>
+              <input type="hidden" name="pathName" value={usePathname()} />
+              <button type="submit" className="text-gray-700">
+                Sign out
+              </button>
+            </form>
+          </>
         ) : (
           <div className="flex flex-col gap-2 my-4">
             <Link href="/signin" className={s.button}>
