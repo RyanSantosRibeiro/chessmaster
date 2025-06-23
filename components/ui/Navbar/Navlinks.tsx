@@ -62,11 +62,11 @@ export default function Navlinks({ user }: NavlinksProps) {
         ) : (
           <div className="flex flex-col gap-2 my-4">
             <Link href="/signin" className={s.button}>
-              Sign In
+              Connect Wallet
             </Link>
-            <Link href="/signin" className={s.button_secondary}>
+            {/* <Link href="/signin" className={s.button_secondary}>
               Register
-            </Link>
+            </Link> */}
           </div>
         )}
       </div>

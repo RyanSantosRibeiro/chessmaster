@@ -18,7 +18,7 @@ export default function DetailsColumn({ matchCode }: Props) {
   let { game, playerColor } = useMatch();
   const supabase = createClient()
   
-  const [activeTab, setActiveTab] = useState('newMatch');
+  const [activeTab, setActiveTab] = useState('history');
   const { user } = useAuth();
 
   const getRank = async (userId: string) => {
@@ -41,16 +41,16 @@ export default function DetailsColumn({ matchCode }: Props) {
   return (
     <div className="card bg-base-100 w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden">
       <div className="tabs tabs-boxed flex flex-nowrap">
-        <a className={`p-2 w-full tab ${activeTab === 'statistic' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
+        {/* <a className={`p-2 w-full tab ${activeTab === 'statistic' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
           onClick={() => setActiveTab('match')}
         >
           Match
-        </a>
+        </a> */}
         <a
           className={`p-2 w-full tab ${activeTab === 'history' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
           onClick={() => setActiveTab('history')}
         >
-          Lances
+          Statistic
         </a>
         {!game && (
           <a className={`p-2 w-full tab ${activeTab === 'newMatch' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
