@@ -15,7 +15,6 @@
 }
 
 .linkDisable::after {
-  @apply badge badge-success;
   content: "Soon";    
   font-size: 11px;
   position: absolute;
