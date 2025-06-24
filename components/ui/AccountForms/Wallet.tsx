@@ -69,7 +69,7 @@ export default function WalletInterface() {
             </div>
             <div className="grid grid-cols-4 gap-2">
               {[0.015, 0.03, 0.045, 0.09].map((val) => (
-                <Button key={val} onClick={() => setAmount(val.toString())} variant="outline">
+                <Button key={val} onClick={() => setAmount(val.toString())}>
                   {val}
                 </Button>
               ))}

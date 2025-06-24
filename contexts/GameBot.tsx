@@ -45,7 +45,7 @@ function useChessVsBotProvider() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const stockfish = useRef<Worker | null>(null);
 
-  function isMoveLegalIgnoringTurn(game, from, to, promotion = 'q') {
+  function isMoveLegalIgnoringTurn(game:any, from:any, to:any, promotion = 'q') {
     const fenParts = game.fen().split(' ');
     // Inverte o turno
     fenParts[1] = fenParts[1] === 'w' ? 'b' : 'w';
@@ -112,7 +112,8 @@ function useChessVsBotProvider() {
     });
   }
 
-  function onPieceDragged(piece: string, square: string) {
+  function onPieceDragged(piece: string, square: Square) {
+    if(!square) return;
     if (selectedSquare && possibleMoves.includes(square)) {
       setSelectedSquare(null);
       setPossibleMoves([]);
@@ -172,8 +173,8 @@ function useChessVsBotProvider() {
     return styles;
   }, [possibleMoves, movePreview, markedSquares]);
 
-  const makeMove = (sourceSquare, targetSquare,piece) => {
-    if (isPaused || game.isGameOver() || winner) return;
+  const makeMove = (sourceSquare:any , targetSquare: any) => {
+    if (isPaused || game.isGameOver() || winner) return false;
     if (!firstMove) setFirstMove(true);
     console.log("Realizando movimento!")
     const move = {
@@ -196,6 +197,7 @@ function useChessVsBotProvider() {
       return true;
     } catch (error) {
       console.log('Erro ao tentar mover peça:', error);
+      return false
     }
 
   };
@@ -252,7 +254,7 @@ function useChessVsBotProvider() {
     setIsPaused(false);
     setWinner(null);
     setTime({ white: initialTime, black: initialTime });
-    setMarkedSquares([])
+    setMarkedSquares(new Set())
   };
 
   return {

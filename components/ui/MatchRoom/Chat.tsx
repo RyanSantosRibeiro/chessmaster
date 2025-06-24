@@ -40,8 +40,9 @@ export default function MatchRoomChat({ matchId }: Props) {
   }, [matchId]);
 
   const sendMessage = async () => {
+    if(!user) return;
     const message: Message = {
-      sender: user.name || user.email,
+      sender: user.email || "You",
       text: input,
     };
 

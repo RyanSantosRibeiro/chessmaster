@@ -51,15 +51,20 @@ export function MatchmakingButtons() {
 
       const match = others.find(
         (p) =>
+          // @ts-ignore
           Math.abs(p.rank_points - profile.rank_points) <= 200 &&
+          // @ts-ignore
           p.ticket_amount_cents === ticket
       );
 
       if (match) {
         console.log("Match!!")
         hasMatched = true;
+        // @ts-ignore
         const isUserWhite = profile.rank_points <= match.rank_points;
+        // @ts-ignore
         const white_player_id = isUserWhite ? user.id : match.user_id;
+        // @ts-ignore
         const black_player_id = isUserWhite ? match.user_id : user.id;
         const isResponsible = isUserWhite;
         const matchId = generateMatchId();
@@ -67,6 +72,7 @@ export function MatchmakingButtons() {
         if (isResponsible) {
           try {
             await supabase.from('matches').insert({
+              // @ts-ignore
               url_hash: matchId,
               white_player_id,
               black_player_id,
@@ -76,9 +82,11 @@ export function MatchmakingButtons() {
 
             await matchmakingChannel.send({
               type: 'broadcast',
+              // @ts-ignore
               event: `match-found-${match.code}`,
                payload: {
                 matchId,
+                // @ts-ignore
                 players: [user.id, match.user_id],
               },
             });

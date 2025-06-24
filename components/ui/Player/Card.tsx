@@ -23,7 +23,7 @@ const PlayerCard: FC<PlayerCardProps> = ({
   botLevel,
   isTurn,
   align,
-  time = "0.0",
+  time = 0.0,
   onBotLevelChange,
 }) => {
   const minutes = Math.floor(time / 60);

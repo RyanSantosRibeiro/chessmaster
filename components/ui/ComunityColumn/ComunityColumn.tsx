@@ -51,13 +51,15 @@ export default function ComunityColumn({ matchCode }: Props) {
 
         {activeTab === 'history' && (
           <div className="text-white text-sm">
-            {moveHistory.length === 0 ? (
+            {moveHistory?.length === 0 ? (
               <p>Nenhum lance ainda.</p>
             ) : (
               <ol className="list-decimal list-inside space-y-1">
-                {moveHistory.map((move, index) => (
-                  <li key={index}>{move}</li>
-                ))}
+                {moveHistory?.map((move, index) => {
+                  return (
+                    <li key={index}>{`${move}`}</li>
+                  )
+                })}
               </ol>
             )}
           </div>
@@ -86,7 +88,7 @@ export default function ComunityColumn({ matchCode }: Props) {
         )}
       </div>
       <div className="h-aut flex flex-col">
-            <MatchRoomChat matchId={matchCode} />
+            <MatchRoomChat matchId={matchCode || "bot"} />
       </div>
     </div>
   );

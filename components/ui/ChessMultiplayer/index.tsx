@@ -6,11 +6,12 @@ import { useEffect, useMemo, useState } from 'react';
 import PlayerCard from '../Player/Card';
 import GameOver from '../Game/GameOver';
 import Controls from '../Controls/Controls';
-import { Chess } from 'chess.js';
+import { Chess, Color } from 'chess.js';
 import { useMatch } from '@/contexts/MatchContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/utils/supabase/client';
 import LoadingDots from '../LoadingDots';
+import { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
 export default function ChessMultiplayer(matchData : any) {
   const { user } = useAuth()
@@ -51,7 +52,7 @@ const playerIds = [matchData?.match?.white_player_id, matchData?.match?.black_pl
   useEffect(() => {
     console.log({matchData, match, user})
     if((!matchData || !user) || game) return;
-    setPlayerColor(matchData?.match?.white_player_id == user.id ? "w" : "b")
+    setPlayerColor(matchData?.match?.white_player_id == user.id ? "white" : "black")
     setMatch(matchData.match);
     setOpponent(matchData.match.black_player)
     setGame(new Chess())
@@ -132,7 +133,7 @@ const playerIds = [matchData?.match?.white_player_id, matchData?.match?.black_pl
     <div className="flex flex-col items-center gap-4 h-full max-h-full">
       <div className="w-full flex items-start justify-between">
         <PlayerCard
-          time={playerColor == "w" ? time.black : time.white}
+          time={playerColor == "w" as BoardOrientation ? time.black : time.white}
           name={opponent?.full_name || "Jhon jones"}
           trophies={opponent?.rank_points} 
           isTurn={!isPlayerTurn ? "Turno" : null}
@@ -147,29 +148,23 @@ const playerIds = [matchData?.match?.white_player_id, matchData?.match?.black_pl
         {isPaused && <GameOver type="game_pause" />}
         <Chessboard
           ref={chessboardRef}
-          className="w-full h-full"
           position={fen}
           // position={fen}
           animationDuration={200}
           arePremovesAllowed={true}
-          boardOrientation={playerColor == "w" ? "white" : "black"}
+          boardOrientation={playerColor == "w" as BoardOrientation? "white" : "black"}
           // onPieceDrop={onDrop}
           onPieceDrop={makeMove}
-          onPromotionPieceSelect={(piece, promoteFromSquare, promoteToSquare) => console.log({piece, promoteFromSquare, promoteToSquare})}
           onSquareRightClick={onSquareRightClick}
           onPieceDragBegin={onPieceDragged}
           onPieceDragEnd={() => setPossibleMoves([])}
           customSquareStyles={customSquareStyles}
-          boardStyle={{
-            borderRadius: '0.375rem', // rounded-sm
-            boxShadow: '0 0 0 2px #e5e7eb',
-          }}
         />
       </div>
 
       <div className="w-full flex items-end justify-end">
         <PlayerCard 
-        time={playerColor == "w" ? time.white : time.black} 
+        time={playerColor == "white" ? time.white : time.black} 
         name={match?.black_player?.full_name || "Jhon jones"}
         trophies={match?.black_player?.rank_points} 
         isTurn={isPlayerTurn ? "Sua vez" : null} align="right" />

@@ -8,7 +8,7 @@ import GameOver from '../Game/GameOver';
 import Controls from '../Controls/Controls';
 import { Chess } from 'chess.js';
 
-export default function ChessVsBot({ initialLevel = 3 }: { level?: number }) {
+export default function ChessVsBot() {
   const {
     fen,
     makeMove,
@@ -31,18 +31,18 @@ export default function ChessVsBot({ initialLevel = 3 }: { level?: number }) {
     chessboardRef
   } = useChessVsBot();
 
-  function onDrop(sourceSquare, targetSquare, piece) {
-    const move = {
-      from: sourceSquare,
-      to: targetSquare,
-      promotion: "q", // promoção automática para rainha
-    };
+  // function onDrop(sourceSquare, targetSquare, piece) {
+  //   const move = {
+  //     from: sourceSquare,
+  //     to: targetSquare,
+  //     promotion: "q", // promoção automática para rainha
+  //   };
 
-    const result = game.move(move);
-    if (result === null) return false; // movimento ilegal
-    setGame(new Chess(game.fen())); // atualiza o estado do jogo
-    return true;
-  }
+  //   const result = game.move(move);
+  //   if (result === null) return false; // movimento ilegal
+  //   setGame(new Chess(game.fen())); // atualiza o estado do jogo
+  //   return true;
+  // }
 
 
   return (
@@ -53,7 +53,7 @@ export default function ChessVsBot({ initialLevel = 3 }: { level?: number }) {
           name="Bot Magnus"
           isBot
           botLevel={level}
-          isTurn={!isPlayerTurn}
+          isTurn={!isPlayerTurn ? "Your turn" : null}
           onBotLevelChange={(level) => {
             setLevel(level);
             restart();
@@ -70,28 +70,22 @@ export default function ChessVsBot({ initialLevel = 3 }: { level?: number }) {
         
 
         <Chessboard
-        ref={chessboardRef}
-          className="w-full h-full"
+          ref={chessboardRef}
           position={fen}
           // position={fen}
           animationDuration={200}
           arePremovesAllowed={true}
           // onPieceDrop={onDrop}
           onPieceDrop={makeMove}
-          onPromotionPieceSelect={(piece, promoteFromSquare, promoteToSquare) => console.log({piece, promoteFromSquare, promoteToSquare})}
           onSquareRightClick={onSquareRightClick}
           onPieceDragBegin={onPieceDragged}
           onPieceDragEnd={() => setPossibleMoves([])}
           customSquareStyles={customSquareStyles}
-          boardStyle={{
-            borderRadius: '0.375rem', // rounded-sm
-            boxShadow: '0 0 0 2px #e5e7eb',
-          }}
         />
       </div>
 
       <div className="w-full flex items-end justify-end">
-        <PlayerCard time={time.white} name="Você" trophies={1200} isTurn={isPlayerTurn} align="right" />
+        <PlayerCard time={time.white} name="Você" trophies={1200} isTurn={isPlayerTurn ? "Your turn" : null} align="right" />
       </div>
     </div>
   );

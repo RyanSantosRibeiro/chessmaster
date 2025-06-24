@@ -9,6 +9,7 @@ import StatisticColumn from './Statistic';
 import { MatchmakingButtons } from '../Queue/QueueManagerList';
 import { useChessVsBot } from '@/contexts/GameBot';
 import { createClient } from '@/utils/supabase/client';
+import { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
 type Props = {
   matchCode?: string;
@@ -20,22 +21,6 @@ export default function DetailsColumn({ matchCode }: Props) {
   
   const [activeTab, setActiveTab] = useState('history');
   const { user } = useAuth();
-
-  const getRank = async (userId: string) => {
-      try {
-        const { data: profile, error } = await supabase
-        .from('profile')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-        if(error) return;
-
-        setProfile(profile);
-      } catch (error) {
-        console.log(error)
-      }
-    }
 
 
   return (
@@ -62,9 +47,9 @@ export default function DetailsColumn({ matchCode }: Props) {
       </div>
 
       <div className="card-body flex-1 overflow-y-auto p-4 rounded-[10px_10px_0_0] bg-base-100">
-        {activeTab === 'summary' && (
+        {activeTab === 'summary' && game && (
           <div className="text-sm text-white space-y-2">
-            <p><span className="font-semibold">Cor:</span> {playerColor === 'white' ? 'Branco' : 'Preto'}</p>
+            <p><span className="font-semibold">Cor:</span> {playerColor === 'white' as BoardOrientation? 'Branco' : 'Preto'}</p>
             <p><span className="font-semibold">Turno Atual:</span> {game.turn() === 'w' ? 'Branco' : 'Preto'}</p>
             <p><span className="font-semibold">Status:</span> {game.isGameOver() ? 'Finalizado' : 'Em andamento'}</p>
             <p><span className="font-semibold">Chequemate:</span> {game.isCheckmate() ? 'Sim' : 'Não'}</p>
@@ -100,7 +85,7 @@ export default function DetailsColumn({ matchCode }: Props) {
         )}
       </div>
       <div className="h-auto flex flex-col">
-            <MatchRoomChat matchId={matchCode} />
+            <MatchRoomChat matchId={matchCode || "bot"} />
       </div>
     </div>
   );

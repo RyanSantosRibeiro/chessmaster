@@ -51,7 +51,6 @@ export const MatchProvider = ({ children }: { children: ReactNode }) => {
 
   const endGameAsDraw = useCallback(() => {
     console.log('Game ended as draw due to timeout');
-    game.draw();
     setGame(new Chess(game.fen())); // Atualiza instância
     // Aqui você poderia também salvar o resultado no banco
   }, [game]);

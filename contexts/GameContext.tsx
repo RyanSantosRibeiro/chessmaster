@@ -44,17 +44,18 @@ function useMultiplayer() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const stockfish = useRef<Worker | null>(null);
 
-  function isMoveLegalIgnoringTurn(game, from, to, promotion = 'q') {
-    const fenParts = game.fen().split(' ');
-    // Inverte o turno
-    fenParts[1] = fenParts[1] === 'w' ? 'b' : 'w';
-    const fakeFen = fenParts.join(' ');
+  // @ts-ignore
+  // function isMoveLegalIgnoringTurn(game, from, to, promotion = 'q') {
+  //   const fenParts = game.fen().split(' ');
+  //   // Inverte o turno
+  //   fenParts[1] = fenParts[1] === 'w' ? 'b' : 'w';
+  //   const fakeFen = fenParts.join(' ');
     
-    const clone = new Chess(fakeFen);
-    const move = clone.move({ from, to, promotion });
+  //   const clone = new Chess(fakeFen);
+  //   const move = clone.move({ from, to, promotion });
   
-    return !!move;
-  }
+  //   return !!move;
+  // }
 
   function changeFenTurn(fen: string, newTurn: 'w' | 'b'): string {
     const parts = fen.split(' ');
@@ -133,11 +134,14 @@ function useMultiplayer() {
 
 
         console.log({clone, square})
+        // @ts-ignore
         const moves = clone.moves({ square, verbose: true });
+        // @ts-ignore
         const hasPiece = game.get(square);
         console.log({square, piece, moves,hasPiece})
           if (moves?.length > 0) {
             setSelectedSquare(square);
+            // @ts-ignore
             setPossibleMoves(moves.map((m) => m.to));
           } else {
             setSelectedSquare(null);
@@ -170,6 +174,7 @@ function useMultiplayer() {
     return styles;
   }, [possibleMoves, movePreview, markedSquares]);
 
+  // @ts-ignore
   const makeMove = (sourceSquare, targetSquare,piece) => {
     if (isPaused || game.isGameOver() || winner) return;
     if (!firstMove) setFirstMove(true);
@@ -245,7 +250,8 @@ function useMultiplayer() {
     setIsPaused(false);
     setWinner(null);
     setTime({ white: initialTime, black: initialTime });
-    setMarkedSquares([])
+
+    setMarkedSquares(new Set())
   };
 
   return {

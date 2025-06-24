@@ -11,6 +11,7 @@ type AuthContextType = {
   loading: boolean
 }
 
+// @ts-ignore
 const AuthContext = createContext<AuthContextType>({ user: null, loading: true })
 
 export function AuthProvider({

@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Chess, Color, Piece, PieceSymbol, Square } from 'chess.js';
 import { createClient } from '@/utils/supabase/client';
+import { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 
 export type PlayerTime = {
   white: number;
@@ -38,7 +39,7 @@ function useMatchProvider() {
   const [isPaused, setIsPaused] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
   const [firstMove, setFirstMove] = useState(false);
-  const [playerColor, setPlayerColor] = useState<'w' | 'b'>('w');
+  const [playerColor, setPlayerColor] = useState<BoardOrientation>('white');
   const [markedSquares, setMarkedSquares] = useState<Set<string>>(new Set());
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
   const [possibleMoves, setPossibleMoves] = useState<string[]>([]);
@@ -53,7 +54,7 @@ function useMatchProvider() {
   const [startTimestamp, setStartTimestamp] = useState<number | null>(null);
   
 
-  function changeFenTurn(fen: string, newTurn: 'w' | 'b'): string {
+  function changeFenTurn(fen: string, newTurn: 'white' | 'black'): string {
     const parts = fen.split(' ');
     if (parts.length < 2) throw new Error("FEN inválido");
     parts[1] = newTurn;
@@ -71,11 +72,11 @@ function useMatchProvider() {
     const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
 
     setTime((prev) => {
-      const currentTurn = game.turn() === 'w' ? 'white' : 'black';
+      const currentTurn = game.turn() === 'white' as Color ? 'white' : 'black';
       const timeLeft = Math.max(initialTime[currentTurn] - elapsedSeconds, 0);
 
       if (timeLeft === 0 && !winner) {
-        setWinner(currentTurn === 'white' ? 'b' : 'w');
+        setWinner(currentTurn === 'white' ? 'black' : 'white');
         clearInterval(timerRef.current!);
       }
 
@@ -104,7 +105,7 @@ function useMatchProvider() {
     });
   }
 
-  function onPieceDragged(piece: string, square: string) {
+  function onPieceDragged(piece: string, square: Square) {
     if(!game) return;
     if (selectedSquare && possibleMoves.includes(square)) {
       setSelectedSquare(null);
@@ -114,7 +115,6 @@ function useMatchProvider() {
         const clone = new Chess(changeFenTurn(game.fen(), playerColor))
 
         const moves = clone.moves({ square, verbose: true });
-        const hasPiece = game.get(square);
           if (moves?.length > 0) {
             setSelectedSquare(square);
             setPossibleMoves(moves.map((m) => m.to));
@@ -149,10 +149,10 @@ function useMatchProvider() {
     return styles;
   }, [possibleMoves, movePreview, markedSquares]);
 
-  const makeMove = (sourceSquare, targetSquare,piece) => {
-    if(!game) return;
-    if(piece[0] != playerColor) return;
-    if (isPaused || game.isGameOver() || winner) return;
+  const makeMove = (sourceSquare:Square, targetSquare:Square,piece:any) => {
+    if(!game) return false;
+    if(piece[0] != playerColor) return false;
+    if (isPaused || game.isGameOver() || winner) return false;
     if (!firstMove) setFirstMove(true);
     const move = {
       from: sourceSquare,
@@ -169,6 +169,7 @@ function useMatchProvider() {
       return true;
     } catch (error) {
       console.log('Erro ao tentar mover peça:', error);
+      return false;
     }
 
   };
@@ -266,7 +267,7 @@ function useMatchProvider() {
     game,
     fen: game?.fen(),
     makeMove,
-    isPlayerTurn: game?.turn() == playerColor ? true : false,
+    isPlayerTurn: game?.turn() == playerColor as Color ? true : false,
     isPaused,
     gameOver: game?.isGameOver() || Boolean(winner),
     turn: game?.turn(),
@@ -277,7 +278,6 @@ function useMatchProvider() {
     level,
     time,
     winner,
-    playerColor,
     markedSquares, setMarkedSquares,onSquareRightClick,
     moveHistory: game?.history({ verbose: true }),
     onPieceDragged,
