@@ -1,4 +1,3 @@
-
 'use client';
 
 import ChessVsBot from '@/components/ui/ChessBot';
@@ -9,9 +8,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 
-const QueueManager = dynamic(() => import('@/components/ui/Queue/QueueManager'), {
-  ssr: false
-});
+const QueueManager = dynamic(
+  () => import('@/components/ui/Queue/QueueManager'),
+  {
+    ssr: false
+  }
+);
 
 export default function PlayPage() {
   const { user, loading } = useAuth();
@@ -22,7 +24,7 @@ export default function PlayPage() {
 
   return (
     <div className="flex gap-4 p-4 max-h-full w-full xl:px-20 h-full">
-      <div className="bg-zinc-900 rounded-lg p-4 max-h-full overflow-hidden w-auto h-full">
+      <div className="bg-[#13181b] rounded-lg p-4 max-h-full overflow-hidden w-auto h-full">
         <ChessVsBot />
       </div>
       <DetailsColumn />

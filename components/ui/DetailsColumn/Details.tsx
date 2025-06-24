@@ -74,7 +74,7 @@ export default function DetailsColumn({ matchCode }: Props) {
                   </Suspense>
                 </>
               ) : (
-                <h2 className="text-xl font-bold mb-2">Please sign in to play</h2>
+                <h2 className="text-xl font-bold mb-2">Please connect wallet to play</h2>
               )}
             </div>
             <div className="bg-nivel-2 rounded-lg p-4">

@@ -26,7 +26,11 @@ export default async function RootLayout({ children }: PropsWithChildren) {
   const user = await getUser(supabase)
   return (
     <html lang="en" data-theme="dark" className="dark">
-      <body className="bg-base-200">
+      <head>
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+      </head>
+      <body className="bg-[#0f1315_!important]">
         <AuthProvider  initialUser={user}>
           <div className='flex w-screen h-screen'>
                <div className="sticky top-0 left-0 bg-[#13181b] z-40 transition-all duration-150 h-full w-full max-w-[160px] p-2">

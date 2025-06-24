@@ -27,20 +27,20 @@ export default function Navlinks({ user }: NavlinksProps) {
           <Logo />
         </Link>
         <nav className="w-full flex flex-col gap-2">
-          <Link href="/play" className={s.link}>
+          <Link href="/play" className="transition-all duration-150 py-2 font-semibold rounded px-2">
             ▶️ Play
           </Link>
-          <Link href="/play" className={s.link}>
+          <Link href="/play" className="transition-all duration-150 py-2 font-semibold rounded px-2">
             🚀 Scoreboard
           </Link>
-          <p className={s.linkDisable}>
+          <p className="linkDisable relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default">
             🏆 Tournaments
           </p>
-          <p className={s.linkDisable}>
+          <p className="linkDisable relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default">
             🌎 Friends
           </p>
           {user && (
-            <Link href="/account" className={s.link}>
+            <Link href="/account" className="transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default">
               👤 Account
             </Link>
           )}
@@ -61,9 +61,9 @@ export default function Navlinks({ user }: NavlinksProps) {
           </>
         ) : (
           <div className="flex flex-col gap-2 my-4">
-            <Link href="/signin" className={s.button}>
+            <p className="linkDisable btn btn-primary relative">
               Connect Wallet
-            </Link>
+            </p>
             {/* <Link href="/signin" className={s.button_secondary}>
               Register
             </Link> */}
@@ -74,7 +74,7 @@ export default function Navlinks({ user }: NavlinksProps) {
       <div className='flex flex-col gap-2 mt-auto pt-2'>
         <a href='/' className='text-gray-700'>Suport</a>
         <a href='/' className='text-gray-700'>About Us</a>
-        <p className="text-gray-700 text-xs">© 2023 Chess Platform</p>
+        <p className="text-gray-700 text-xs">© 2025 Aurion Runes Platform</p>
       </div>
     </div>
   );

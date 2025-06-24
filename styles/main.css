@@ -1,7 +1,9 @@
-
+@import "tailwindcss";
+@plugin "daisyui";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@tailwindcss reference;
 
 .height-screen-helper {
   height: calc(100vh - 80px);
@@ -21,9 +23,6 @@
   background-color: rgba(34, 197, 94, 0.13);
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 *,
 *:before,
@@ -189,4 +188,20 @@ p a {
 
 .modal-backdrop {
   backdrop-filter: blur(2px);
+}
+
+.linkDisable {
+  position: relative;
+}
+.linkDisable::after {
+  padding: 3px 6px;
+  border-radius: 8px;
+  background-color: #00aad3;
+  color: white;
+  content: "Soon";    
+  font-size: 11px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  scale: .7;
 }

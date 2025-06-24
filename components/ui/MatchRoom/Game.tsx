@@ -75,35 +75,39 @@ export default function GameRoom() {
     if (!matchId || !user) return;
 
     const channel = supabase.channel(`match-${matchId}`, {
-      config: { presence: { key: user.id } },
+      config: { presence: { key: user.id } }
     });
 
-    console.log({broadcast: `match-${matchId}`})
+    console.log({ broadcast: `match-${matchId}` });
     channel
       .on('broadcast', { event: 'new-move' }, ({ payload }) => {
-        console.log("broadcast---> NEW MOVE")
+        console.log('broadcast---> NEW MOVE');
         const move = payload.move;
-        if(!gameRef?.current) return;
-        
+        if (!gameRef?.current) return;
+
         try {
           const newGame = new Chess(gameRef.current.fen());
-          newGame.move({ from: move.slice(0, 2), to: move.slice(2, 4), promotion: 'q' });
+          newGame.move({
+            from: move.slice(0, 2),
+            to: move.slice(2, 4),
+            promotion: 'q'
+          });
           setGame(newGame);
           setIsMyTurn(true);
           updateMoveHistory(move);
         } catch (error) {
-          console.log(error)
+          console.log(error);
         }
       })
       .on('presence', { event: 'leave' }, ({ key }) => {
-        console.log("broadcast---> LEAVY")
+        console.log('broadcast---> LEAVY');
         if (key !== user.id) {
           setDisconnected(true);
           pauseGame();
         }
       })
       .on('presence', { event: 'join' }, ({ key }) => {
-        console.log("broadcast---> JOIN")
+        console.log('broadcast---> JOIN');
         if (key !== user.id) {
           setDisconnected(false);
           resumeGame();
@@ -119,7 +123,6 @@ export default function GameRoom() {
   // 3. Make move
   const makeMove = (source: string, target: string) => {
     if (!isMyTurn || !matchId || !playerColor || !game) return false;
-    
 
     try {
       const newGame = new Chess(game.fen());
@@ -128,40 +131,41 @@ export default function GameRoom() {
         setGame(newGame);
         setIsMyTurn(false);
         updateMoveHistory(source + target);
-  
+
         sessionStorage.setItem(`match-${matchId}-fen`, newGame.fen());
-        sessionStorage.setItem(`match-${matchId}-history`, JSON.stringify(newGame.history()));
-  
-        console.log({broadcast: "send-new-move"})
+        sessionStorage.setItem(
+          `match-${matchId}-history`,
+          JSON.stringify(newGame.history())
+        );
+
+        console.log({ broadcast: 'send-new-move' });
         supabase
           .from('matches')
           // @ts-ignore
           .update({ fen: newGame.fen() })
           .eq('id', matchId);
-  
+
         supabase.channel(`match-${matchId}`).send({
           type: 'broadcast',
           event: 'new-move',
-          payload: { move: source + target },
+          payload: { move: source + target }
         });
-  
+
         return true;
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-
-   
 
     return false;
   };
 
   return (
-    <div className="col-span-6 bg-zinc-900 rounded-lg p-4">
+    <div className="col-span-6 bg-[#13181b] rounded-lg p-4">
       <div className="aspect-square bg-zinc-800 rounded-lg overflow-hidden relative">
         {playerColor && (
           <Chessboard
-          // @ts-ignore
+            // @ts-ignore
             position={game.fen()}
             boardOrientation={playerColor}
             onPieceDrop={makeMove}

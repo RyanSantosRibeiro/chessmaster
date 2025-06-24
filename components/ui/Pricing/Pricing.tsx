@@ -114,7 +114,7 @@ export default function Pricing({ user, products, subscription }: Props) {
               Start building for free, then add a site plan to go live. Account
               plans unlock additional features.
             </p>
-            <div className="relative self-center mt-6 bg-zinc-900 rounded-lg p-0.5 flex sm:mt-8 border border-zinc-800">
+            <div className="relative self-center mt-6 bg-[#13181b] rounded-lg p-0.5 flex sm:mt-8 border border-zinc-800">
               {intervals.includes('month') && (
                 <button
                   onClick={() => setBillingInterval('month')}
@@ -158,7 +158,7 @@ export default function Pricing({ user, products, subscription }: Props) {
                 <div
                   key={product.id}
                   className={cn(
-                    'flex flex-col rounded-lg shadow-sm divide-y divide-zinc-600 bg-zinc-900',
+                    'flex flex-col rounded-lg shadow-sm divide-y divide-zinc-600 bg-[#13181b]',
                     {
                       'border border-pink-500': subscription
                         ? product.name === subscription?.prices?.products?.name
@@ -187,7 +187,7 @@ export default function Pricing({ user, products, subscription }: Props) {
                       type="button"
                       loading={priceIdLoading === price.id}
                       onClick={() => handleStripeCheckout(price)}
-                      className="block w-full py-2 mt-8 text-sm font-semibold text-center text-white rounded-md hover:bg-zinc-900"
+                      className="block w-full py-2 mt-8 text-sm font-semibold text-center text-white rounded-md hover:bg-[#13181b]"
                     >
                       {subscription ? 'Manage' : 'Subscribe'}
                     </Button>
