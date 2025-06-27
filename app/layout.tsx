@@ -8,8 +8,8 @@ import { createClient } from '@/utils/supabase/server';
 import { getUser } from '@/utils/supabase/queries';
 import Navlinks from '@/components/ui/Navbar/Navlinks';
 
-const title = 'Next.js Subscription Starter';
-const description = 'Brought to you by Vercel, Stripe, and Supabase.';
+const title = 'Aurion Runes';
+const description = 'Place to play and bet with chessmasters';
 
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
