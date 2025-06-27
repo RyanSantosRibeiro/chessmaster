@@ -44,7 +44,6 @@ export default function ChessVsBot() {
   //   return true;
   // }
 
-
   return (
     <div className="flex flex-col items-center gap-4 h-full max-h-full">
       <div className="w-full flex items-start justify-between">
@@ -53,21 +52,24 @@ export default function ChessVsBot() {
           name="Bot Magnus"
           isBot
           botLevel={level}
-          isTurn={!isPlayerTurn ? "Your turn" : null}
+          isTurn={!isPlayerTurn ? 'Your turn' : null}
           onBotLevelChange={(level) => {
             setLevel(level);
             restart();
           }}
         />
-        <Controls stop={() => pause()} resume={() => resume()} restart={() => restart()} isPaused={isPaused} />
+        <Controls
+          stop={() => pause()}
+          resume={() => resume()}
+          restart={() => restart()}
+          isPaused={isPaused}
+        />
       </div>
 
       <div className="w-auto h-full aspect-square relative rounded-sm overflow-hidden bg-base-200 flex">
         {winner && <GameOver type="game_win" />}
         {gameOver && <GameOver type="game_over" />}
         {isPaused && <GameOver type="game_pause" />}
-
-        
 
         <Chessboard
           ref={chessboardRef}
@@ -85,7 +87,13 @@ export default function ChessVsBot() {
       </div>
 
       <div className="w-full flex items-end justify-end">
-        <PlayerCard time={time.white} name="Você" trophies={1200} isTurn={isPlayerTurn ? "Your turn" : null} align="right" />
+        <PlayerCard
+          time={time.white}
+          name="You"
+          trophies={1200}
+          isTurn={isPlayerTurn ? 'Your turn' : null}
+          align="right"
+        />
       </div>
     </div>
   );

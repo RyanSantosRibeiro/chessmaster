@@ -1,7 +1,12 @@
-
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback
+} from 'react';
 import { Chess } from 'chess.js';
 import type { ReactNode } from 'react';
 
@@ -22,25 +27,26 @@ type MatchContextType = {
   endGameAsDraw: () => void;
   updateMoveHistory: (move: string) => void;
   moveHistory: string[];
-  status:string
+  status: string;
 };
 
 const MatchContext = createContext<MatchContextType | undefined>(undefined);
 
 export const MatchProvider = ({ children }: { children: ReactNode }) => {
-
   const [match, setMatch] = useState<any | null>(null);
   const [game, setGame] = useState(() => new Chess());
   const [matchId, setMatchId] = useState<string | null>(null);
   const [status, setStatus] = useState<string>('');
-  const [playerColor, setPlayerColor] = useState<'white' | 'black' | null>(null);
+  const [playerColor, setPlayerColor] = useState<'white' | 'black' | null>(
+    null
+  );
   const [isMyTurn, setIsMyTurn] = useState<boolean>(false);
   const [disconnected, setDisconnected] = useState(false);
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
 
   const pauseGame = useCallback(() => {
     console.log('Game paused');
-    setStatus('in-progress')
+    setStatus('in-progress');
     // Lógica visual ou de estado para pausar o jogo
   }, []);
 
@@ -52,7 +58,7 @@ export const MatchProvider = ({ children }: { children: ReactNode }) => {
   const endGameAsDraw = useCallback(() => {
     console.log('Game ended as draw due to timeout');
     setGame(new Chess(game.fen())); // Atualiza instância
-    // Aqui você poderia também salvar o resultado no banco
+    // Aqui You poderia também salvar o resultado no banco
   }, [game]);
 
   const updateMoveHistory = useCallback((move: string) => {
