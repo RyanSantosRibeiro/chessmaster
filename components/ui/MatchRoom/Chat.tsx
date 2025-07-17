@@ -85,7 +85,7 @@ export default function MatchRoomChat({ matchId }: Props) {
               sendMessage();
             }
           }}
-          placeholder="Digite uma mensagem"
+          placeholder="Type a message"
           className="flex-1 px-2 py-1 rounded text-sm bg-[#13181b] w-full"
         />
         <button
