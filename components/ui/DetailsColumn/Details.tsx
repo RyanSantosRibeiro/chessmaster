@@ -21,7 +21,7 @@ function getTimeUntilFriday() {
 
   // Set target to upcoming Friday at 00:00
   const dayOfWeek = now.getDay(); // Sunday = 0
-  const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7; // next Friday
+  const daysUntilFriday = (5 - dayOfWeek + 8) % 7 || 7; // next Friday
   target.setDate(now.getDate() + daysUntilFriday);
   target.setHours(0, 0, 0, 0);
 
@@ -105,7 +105,7 @@ export default function DetailsColumn({ matchCode }: Props) {
               ) : (
                 
                 <div className="flex flex-col items-center justify-center gap-4 p-4">
-                  <h2 className="text-5xl font-bold mb-2">A new era of chess begins</h2>
+                  <h2 className="text-5xl font-bold mb-2">A new era of Chess begins</h2>
                   <p className="text-md font-bold mb-2">Connect your wallet. The warriors are coming.</p>
                   <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
                     <div className="flex flex-col">

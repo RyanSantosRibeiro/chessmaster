@@ -1,7 +1,7 @@
 @tailwindcss reference;
 
 .root {
-   @apply w-full text-center bg-[#4cb2b6] text-white cursor-pointer inline-flex px-5 leading-6  transition ease-in-out duration-150 shadow-sm font-semibold text-center justify-center uppercase py-4 border border-transparent items-center;
+   @apply w-full text-center bg-[#4cb2b6] text-white cursor-pointer inline-flex px-5 leading-6  transition ease-in-out duration-150 shadow-sm  text-center justify-center uppercase py-4 border border-transparent items-center;
 }
 
 .root:hover {
@@ -21,7 +21,7 @@
 }
 
 .slim {
-  @apply py-2 transform-none normal-case;
+  @apply transform-none normal-case;
 }
 
 .disabled,
