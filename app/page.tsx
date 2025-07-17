@@ -27,16 +27,24 @@ export default async function PricingPage() {
             <div className="text-center mb-16">
               {/* Featured Image */}
               <div className="mb-12">
-                <div className="relative group max-w-4xl mx-auto">
+                <div className="relative group mx-auto">
                   <div className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
           <img
             src={bg.src}
                     alt="Fair and Secure Gaming"
+<<<<<<< HEAD
                     className="relative rounded-3xl w-full max-h-[400px] object-cover shadow-2xl group-hover:scale-[1.02] transition-transform duration-500"
             width={1500}
             height={500}
           />
         </div>
+=======
+                    className="relative rounded-3xl w-full max-h-[400px] object-cover shadow-2xl "
+                    width={1500}
+                    height={500}
+                  />
+                </div>
+>>>>>>> d47f636c64c1bff9be5fb4d5ebd9ef000c8461f0
               </div>
               
               <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-6 animate-pulse">
@@ -65,7 +73,7 @@ export default async function PricingPage() {
 
         {/* Features Section */}
         <div className="container mx-auto px-4 mb-20">
-          <h2 className="text-5xl font-bold text-center mb-16 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <h2 className="text-5xl font-bold text-center my-16 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Why Choose Aurion?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

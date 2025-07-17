@@ -148,4 +148,4 @@ Esta plataforma permite que usuários joguem partidas de xadrez online, em forma
 
 ---
 
-Se quiser, posso gerar essa documentação como arquivo `.md` para você baixar ou publicar. Deseja isso?
+Se quiser, posso gerar essa documentação como arquivo `.md` para You baixar ou publicar. Deseja isso?

@@ -66,7 +66,7 @@ export const POST = async (req: Request) => {
   }
 
   const userId = user.id;
-  // agora você pode usar userId com segurança
+  // agora You pode usar userId com segurança
 
   const body = await req.json();
   const { ticket } = body;
@@ -96,7 +96,7 @@ export const POST = async (req: Request) => {
       playerB: opponent
     };
 
-    // Aqui você pode salvar a partida no Supabase ou emitir evento Realtime
+    // Aqui You pode salvar a partida no Supabase ou emitir evento Realtime
     console.log('Match found:', match);
     return NextResponse.json({ matchFound: true, match });
   } else {
