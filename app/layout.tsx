@@ -4,6 +4,7 @@ import { PropsWithChildren, Suspense } from 'react';
 import { getURL } from '@/utils/helpers';
 import 'styles/main.css';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { WalletProvider } from '@/contexts/WalletContext';
 import { createClient } from '@/utils/supabase/server';
 import { getUser } from '@/utils/supabase/queries';
 import Navlinks from '@/components/ui/Navbar/Navlinks';
@@ -31,21 +32,23 @@ export default async function RootLayout({ children }: PropsWithChildren) {
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
       </head>
       <body className="bg-[#0f1315_!important]">
-        <AuthProvider  initialUser={user}>
-          <div className='flex w-screen h-screen'>
-               <div className="sticky top-0 left-0 bg-[#13181b] z-40 transition-all duration-150 h-full w-full max-w-[160px] p-2">
-                      <Navlinks user={user} />
-                    </div>
+        <AuthProvider initialUser={user}>
+          <WalletProvider>
+            <div className='flex w-screen h-screen'>
+              <div className="sticky top-0 left-0 bg-[#13181b] z-40 transition-all duration-150 h-full w-full max-w-[160px] p-2">
+                <Navlinks user={user} />
+              </div>
               <main
                 id="skip"
                 className="min-h-screen w-full flex flex-col items-center justify-center overflow-hidden"
               >
                 {children}
               </main>
-          </div>
-          <Suspense>
-            <Toaster />
-          </Suspense>
+            </div>
+            <Suspense>
+              <Toaster />
+            </Suspense>
+          </WalletProvider>
         </AuthProvider>
       </body>
     </html>

@@ -133,9 +133,17 @@ export default function DetailsColumn({ matchCode }: Props) {
                       <span className="text-sm">sec</span>
                     </div>
                   </div>
-                  <p className="btn linkDisable relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default">
-                    🌎 Search for a match
-                  </p>
+                  <div className="flex flex-row gap-2">
+                    <p className="btn linkDisable relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default">
+                      🌎 0.00005 BTC
+                    </p>
+                    <p className="btn linkDisable relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default">
+                      🌎 0.0001 BTC
+                    </p>
+                    <p className="btn linkDisable relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default">
+                      🌎 0.0005 BTC
+                    </p>
+                  </div>
                 </div>
               )}
             </div>

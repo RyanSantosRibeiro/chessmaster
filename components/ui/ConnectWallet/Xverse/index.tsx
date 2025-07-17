@@ -103,8 +103,7 @@ export default function ConnectXverse() {
 
   return (
     <div className="p-4 space-y-4">
-      <h2 className="text-sm font-bold">Connect on Xverse (WalletConnect v2)</h2>
-      {connected && accounts.length > 0 ? (
+      {connected && accounts.length > 0 && (
         <div>
           <p className="text-green-600 break-all">
             Wallet: {accounts[0]}
@@ -116,13 +115,6 @@ export default function ConnectXverse() {
             Desconnect
           </button>
         </div>
-      ) : (
-        <button
-          onClick={connectWallet}
-          className="px-4 py-2 rounded-lg p-4 overflow-hidden inset-0 bg-gradient-to-r from-primary/10 to-secondary/10"
-        >
-          Connect Wallet
-        </button>
       )}
     </div>
   );

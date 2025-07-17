@@ -29,14 +29,22 @@ export default async function PricingPage() {
               <div className="mb-12">
                 <div className="relative group mx-auto">
                   <div className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
-                  <img
-                    src={bg.src}
+          <img
+            src={bg.src}
                     alt="Fair and Secure Gaming"
+<<<<<<< HEAD
+                    className="relative rounded-3xl w-full max-h-[400px] object-cover shadow-2xl group-hover:scale-[1.02] transition-transform duration-500"
+            width={1500}
+            height={500}
+          />
+        </div>
+=======
                     className="relative rounded-3xl w-full max-h-[400px] object-cover shadow-2xl "
                     width={1500}
                     height={500}
                   />
                 </div>
+>>>>>>> d47f636c64c1bff9be5fb4d5ebd9ef000c8461f0
               </div>
               
               <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-6 animate-pulse">
@@ -112,7 +120,7 @@ export default async function PricingPage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <button className="btn btn-primary btn-lg px-8 py-4 text-lg font-bold hover:scale-105 transition-transform duration-300 shadow-2xl">
                   Create Free Account!
-                </button>
+              </button>
                 <a 
                   href="https://odin.fun/token/2k6r" 
                   target="_blank" 

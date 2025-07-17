@@ -9,8 +9,11 @@ import { getRedirectMethod } from '@/utils/auth-helpers/settings';
 import s from './Navbar.module.css';
 import Modal from '../Modal/Modal';
 import WalletInterface from '../AccountForms/Wallet';
+import WalletConnect from '../WalletCtx/Wallet';
 import { useAuth } from '@/contexts/AuthContext';
 import ConnectXverse from '../ConnectWallet/Xverse';
+import { useWallet } from '@/contexts/WalletContext';
+import { useState } from 'react';
 
 interface NavlinksProps {
   user?: any;
@@ -18,8 +21,22 @@ interface NavlinksProps {
 
 export default function Navlinks({ user }: NavlinksProps) {
   const router = getRedirectMethod() === 'client' ? useRouter() : null;
-  const {profile} = useAuth();
-  console.log({profile})
+  const { profile } = useAuth();
+  const { walletData, disconnectWallet } = useWallet();
+  const [showDisconnectMenu, setShowDisconnectMenu] = useState(false);
+
+  console.log({ profile });
+
+  const handleWalletClick = () => {
+    if (walletData) {
+      setShowDisconnectMenu(!showDisconnectMenu);
+    }
+  };
+
+  const handleDisconnect = () => {
+    disconnectWallet();
+    setShowDisconnectMenu(false);
+  };
 
   return (
     <div className="relative flex flex-col justify-between py-4 align-center md:py-6 h-full">
@@ -66,6 +83,30 @@ export default function Navlinks({ user }: NavlinksProps) {
             {/* <Link href="/signin" className={s.button_secondary}>
               Register
             </Link> */}
+            {walletData ? (
+              <div className="relative">
+                <button
+                  onClick={handleWalletClick}
+                  className="w-full btn btn-primary text-xs font-mono rounded-lg p-4 overflow-hidden inset-0 bg-gradient-to-r from-primary/10 to-secondary/10"
+                >
+                  {walletData.address.slice(0, 6)}...{walletData.address.slice(-4)} 
+                </button>
+                {showDisconnectMenu && (
+                  <div className="absolute bottom-full left-0 right-0 mb-2 bg-gray-800 border border-gray-700 rounded-lg p-2 z-50">
+                    <button
+                      onClick={handleDisconnect}
+                      className="w-full text-left text-red-400 hover:text-red-300 text-sm py-1 px-2 rounded"
+                    >
+                      Disconnect Wallet
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Modal cta={{text: 'Connect Wallet', type: 'primary'}}>
+                <WalletConnect />
+              </Modal>
+            )}
           </div>
         )}
       </div>
