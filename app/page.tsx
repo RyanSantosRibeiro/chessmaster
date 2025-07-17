@@ -32,19 +32,11 @@ export default async function PricingPage() {
           <img
             src={bg.src}
                     alt="Fair and Secure Gaming"
-<<<<<<< HEAD
-                    className="relative rounded-3xl w-full max-h-[400px] object-cover shadow-2xl group-hover:scale-[1.02] transition-transform duration-500"
-            width={1500}
-            height={500}
-          />
-        </div>
-=======
                     className="relative rounded-3xl w-full max-h-[400px] object-cover shadow-2xl "
                     width={1500}
                     height={500}
                   />
                 </div>
->>>>>>> d47f636c64c1bff9be5fb4d5ebd9ef000c8461f0
               </div>
               
               <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-6 animate-pulse">

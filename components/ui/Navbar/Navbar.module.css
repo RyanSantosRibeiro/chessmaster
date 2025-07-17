@@ -3,7 +3,7 @@
 }
 
 .link {
-  @apply transition-all duration-150  px-2;
+  @apply transition-all duration-150 ;
 }
 .link:hover {
   background-color: rgba(255, 255, 255, 0.031);
@@ -11,7 +11,7 @@
 
 .linkDisable {
   position: relative;
-  @apply transition-all duration-150 px-2 opacity-30 cursor-default;
+  @apply transition-all duration-150 opacity-30 cursor-default;
 }
 
 .linkDisable::after {
@@ -24,26 +24,12 @@
 }
 
 
-.button {
-  @apply w-full text-center bg-[#4cb2b6] cursor-pointer inline-flex px-5 leading-6  transition ease-in-out duration-150 shadow-sm text-center justify-center uppercase py-4 border border-transparent items-center;
-}
-
-.button_secondary {
-  @apply w-full text-center bg-white text-[#4cb2b6] cursor-pointer inline-flex px-5 leading-6  transition ease-in-out duration-150 shadow-sm text-center justify-center uppercase py-4 border border-transparent items-center;
-}
-
 .button:hover,
 .button_secondary:hover {
   @apply opacity-80;
 }
 
-.button:focus {
-  @apply outline-none text-zinc-100 ring-2 ring-opacity-50;
-}
 
-.logo {
-  @apply mb-4 cursor-pointer rounded-full transform duration-100 ease-in-out;
-}
 
 .link.disable {
   opacity: .6;
