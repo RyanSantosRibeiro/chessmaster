@@ -3,7 +3,7 @@
 }
 
 .link {
-  @apply text-white transition-all duration-150 py-2 font-semibold rounded px-2;
+  @apply transition-all duration-150 py-2 font-semibold rounded px-2;
 }
 .link:hover {
   background-color: rgba(255, 255, 255, 0.031);
@@ -11,7 +11,7 @@
 
 .linkDisable {
   position: relative;
-  @apply text-white transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default;
+  @apply transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default;
 }
 
 .linkDisable::after {
@@ -25,11 +25,11 @@
 
 
 .button {
-  @apply rounded-md w-full text-center bg-[#4cb2b6] text-white cursor-pointer inline-flex px-5 leading-6  transition ease-in-out duration-150 shadow-sm font-semibold text-center justify-center uppercase py-4 border border-transparent items-center;
+  @apply w-full text-center bg-[#4cb2b6] cursor-pointer inline-flex px-5 leading-6  transition ease-in-out duration-150 shadow-sm font-semibold text-center justify-center uppercase py-4 border border-transparent items-center;
 }
 
 .button_secondary {
-  @apply rounded-md w-full text-center bg-white text-[#4cb2b6] cursor-pointer inline-flex px-5 leading-6  transition ease-in-out duration-150 shadow-sm font-semibold text-center justify-center uppercase py-4 border border-transparent items-center;
+  @apply w-full text-center bg-white text-[#4cb2b6] cursor-pointer inline-flex px-5 leading-6  transition ease-in-out duration-150 shadow-sm font-semibold text-center justify-center uppercase py-4 border border-transparent items-center;
 }
 
 .button:hover,

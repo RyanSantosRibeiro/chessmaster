@@ -10,6 +10,7 @@ import s from './Navbar.module.css';
 import Modal from '../Modal/Modal';
 import WalletInterface from '../AccountForms/Wallet';
 import { useAuth } from '@/contexts/AuthContext';
+import ConnectXverse from '../ConnectWallet/Xverse';
 
 interface NavlinksProps {
   user?: any;
@@ -61,9 +62,7 @@ export default function Navlinks({ user }: NavlinksProps) {
           </>
         ) : (
           <div className="flex flex-col gap-2 my-4">
-            <p className="linkDisable btn btn-primary relative">
-              Connect Wallet
-            </p>
+            <ConnectXverse />
             {/* <Link href="/signin" className={s.button_secondary}>
               Register
             </Link> */}
