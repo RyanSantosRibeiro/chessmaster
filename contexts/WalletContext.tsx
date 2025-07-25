@@ -2,13 +2,23 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { checkWalletConnection } from '@/components/ui/WalletCtx/WalletsProviders/Unisat';
+import { getUserByWallet } from '@/utils/supabase/queries';
 
-interface WalletData {
+export interface WalletData {
   address: string;
   signature?: string;
 }
 
+export interface UserData {
+  address: string;
+  id: string;
+  username: string;
+  trophies: number;
+  level: number;
+}
+
 interface WalletContextType {
+  user: UserData | null;
   walletData: WalletData | null;
   setWalletData: (data: WalletData | null) => void;
   disconnectWallet: () => void;
@@ -20,6 +30,7 @@ const WALLET_STORAGE_KEY = 'aurion_wallet_data';
 
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [walletData, setWalletDataState] = useState<WalletData | null>(null);
+  const [user, setUser] = useState<UserData | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -48,6 +59,22 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
     loadWalletFromStorage();
   }, []);
+
+  useEffect(() => {
+    console.log({walletData, user})
+    if(walletData && walletData != null && user == null) {
+      getUserInfo(walletData)
+    }
+  }, [walletData]);
+
+  const getUserInfo = async (payload: WalletData) => {
+    const userData = await getUserByWallet(payload)
+
+    console.log({userData})
+      if(userData) {
+        setUser(userData.user)
+      }
+  }
 
   const setWalletData = (data: WalletData | null) => {
     setWalletDataState(data);
@@ -80,7 +107,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <WalletContext.Provider value={{ walletData, setWalletData, disconnectWallet }}>
+    <WalletContext.Provider value={{ walletData, setWalletData, disconnectWallet, user }}>
       {children}
     </WalletContext.Provider>
   );

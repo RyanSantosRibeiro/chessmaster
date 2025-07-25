@@ -1,3 +1,4 @@
+import { WalletData } from '@/contexts/WalletContext';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { cache } from 'react';
 
@@ -51,3 +52,38 @@ export const getUserDetails = cache(async (supabase: SupabaseClient) => {
     .single();
   return profile;
 });
+
+
+export const getUserByWallet = async (wallet: WalletData) => {
+  try {
+      const response = await fetch(`/api/connect`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wallet }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+
+      return result;
+    } catch (error: any) {
+      return error;
+    } 
+}
+
+export const createMatch = async (payload: any) => {
+  try {
+      const response = await fetch(`/api/match`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+
+      return result;
+    } catch (error: any) {
+      return error;
+    } 
+}

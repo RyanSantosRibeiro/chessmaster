@@ -40,7 +40,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
               </div>
               <main
                 id="skip"
-                className="min-h-screen w-full flex flex-col items-center justify-center overflow-hidden"
+                className="min-h-screen w-full flex flex-col justify-start items-center justify-center overflow-x-hidden overflow-y-auto"
               >
                 {children}
               </main>

@@ -4,6 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import Button from '../Button';
 import LoadingDots from '../LoadingDots';
 import { useRouter } from 'next/navigation';
+import { useWallet } from '@/contexts/WalletContext';
+import { createMatch } from '@/utils/supabase/queries';
 
 const supabase = createClient();
 
@@ -13,15 +15,13 @@ const generateMatchId = () =>
 
 export function MatchmakingButtons() {
   const [inQueue, setInQueue] = useState(false);
-  const [ticketValue, setTicketValue] = useState<number | null>(null);
   const [channel, setChannel] = useState<any>(null);
-  const { user, profile } = useAuth();
+  const { user } = useWallet();
   const router = useRouter();
 
   const joinQueue = async (ticket: number) => {
-    if (!user || !profile) return;
+    if (!user) return;
     setInQueue(true);
-    setTicketValue(ticket);
     let hasMatched = false;
 
     const matchmakingChannel = supabase.channel('matchmaking', {
@@ -39,7 +39,7 @@ export function MatchmakingButtons() {
         console.error('Erro ao sair da fila:', err);
       }
     };
-    console.log('Joined in queu');
+    console.log('Joined in queue');
     matchmakingChannel
       .on('presence', { event: 'sync' }, async () => {
         const state = matchmakingChannel.presenceState();
@@ -54,7 +54,7 @@ export function MatchmakingButtons() {
         const match = others.find(
           (p) =>
             // @ts-ignore
-            Math.abs(p.rank_points - profile.rank_points) <= 200 &&
+            Math.abs(p.trophies - user.trophies) <= 200 &&
             // @ts-ignore
             p.ticket_amount_cents === ticket
         );
@@ -63,7 +63,7 @@ export function MatchmakingButtons() {
           console.log('Match!!');
           hasMatched = true;
           // @ts-ignore
-          const isUserWhite = profile.rank_points <= match.rank_points;
+          const isUserWhite = user.trophies <= match.trophies;
           // @ts-ignore
           const white_player_id = isUserWhite ? user.id : match.user_id;
           // @ts-ignore
@@ -73,14 +73,17 @@ export function MatchmakingButtons() {
 
           if (isResponsible) {
             try {
-              await supabase.from('matches').insert({
-                // @ts-ignore
+
+              // const payment = await transferToken() devtransfer Aqui transfere os tokens ou la no back com o createMatch em api/match/route.js
+
+              const reponse = await createMatch({
                 url_hash: matchId,
                 white_player_id,
                 black_player_id,
                 ticket_amount_cents: ticket,
-                status: 'in_progress'
-              });
+              })
+              
+              if(!reponse.sucess) return; // PM - Algum erro ao criar partida
 
               await matchmakingChannel.send({
                 type: 'broadcast',
@@ -94,8 +97,8 @@ export function MatchmakingButtons() {
               });
 
               await cleanup();
-              // alert("Partida encontrada")
-              router.push(`/play/match/${matchId}`);
+              console.log("🟢🟢 Partida encontrada 🟢🟢")
+              // router.push(`/play/match/${matchId}`); Descomentar
             } catch (err) {
               console.error('Erro ao criar partida:', err);
               await cleanup();
@@ -105,15 +108,15 @@ export function MatchmakingButtons() {
       })
       .on(
         'broadcast',
-        { event: `match-found-${profile.username}` },
+        { event: `match-found-${user.username}` },
         async ({ payload }) => {
           const { matchId, players } = payload;
           console.log('Recebeu broadcast de match:', matchId, players);
 
           if (!players.includes(user.id)) return; // Ignora se não for pra You
           await cleanup();
-          // alert("Partida encontrada")
-          router.push(`play/match/${matchId}`);
+          console.log("🟢🟢 broadcast - Partida encontrada 🟢🟢")
+          // router.push(`play/match/${matchId}`); Descomentar
         }
       )
       .on('presence', { event: 'join' }, ({ key, newPresences }) => {
@@ -125,9 +128,9 @@ export function MatchmakingButtons() {
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
           await matchmakingChannel.track({
-            code: profile.username,
+            code: user.username,
             user_id: user.id,
-            rank_points: profile.rank_points,
+            trophies: user.trophies,
             ticket_amount_cents: ticket
           });
         }
@@ -143,16 +146,15 @@ export function MatchmakingButtons() {
     }
     setChannel(null);
     setInQueue(false);
-    setTicketValue(null);
   };
 
   return (
     <div className="space-y-4">
       {!inQueue ? (
         <div className="flex gap-2">
-          <Button onClick={() => joinQueue(1 * 100)}>Play $1</Button>
-          <Button onClick={() => joinQueue(5 * 100)}>Play $5</Button>
-          <Button onClick={() => joinQueue(10 * 100)}>Play $10</Button>
+          <button onClick={() => joinQueue(1)} className='btn relative transition-all duration-150 py-2 font-semibold rounded px-2 cursor-pointer'>Play $1</button>
+          <button onClick={() => joinQueue(5)} className='btn relative transition-all duration-150 py-2 font-semibold rounded px-2 cursor-pointer'>Play $5</button>
+          <button onClick={() => joinQueue(10)} className='btn relative transition-all duration-150 py-2 font-semibold rounded px-2 cursor-pointer'>Play $10</button>
         </div>
       ) : (
         <div className="text-center">

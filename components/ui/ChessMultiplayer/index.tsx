@@ -50,7 +50,6 @@ const playerIds = [matchData?.match?.white_player_id, matchData?.match?.black_pl
 
   
   useEffect(() => {
-    console.log({matchData, match, user})
     if((!matchData || !user) || game) return;
     setPlayerColor(matchData?.match?.white_player_id == user.id ? "white" : "black")
     setMatch(matchData.match);
@@ -84,14 +83,12 @@ const playerIds = [matchData?.match?.white_player_id, matchData?.match?.black_pl
 
         // Verifica se ambos estão online
         const bothOnline = playerIds.every(id => onlinePlayers.includes(id));
-        console.log({bothOnline, playerIds})
         if (bothOnline && !hasStarted) {
           const now = Date.now(); // timestamp em ms
           setHasStarted(true);
           setStartTimestamp(now);
 
           // Só o white envia o timestamp (responsável)
-          console.log("Send Start!", user?.id, matchData.white_player_id)
           if (user?.id === matchData?.white_player_id) {
             matchChannel.send({
               type: 'broadcast',
@@ -102,7 +99,6 @@ const playerIds = [matchData?.match?.white_player_id, matchData?.match?.black_pl
         }
       })
       .on('broadcast', { event: 'start-timer' }, ({ payload }) => {
-        console.log("Start!!!")
         setStartTimestamp(payload.timestamp);
         setHasStarted(true);
       })

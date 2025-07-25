@@ -25,8 +25,6 @@ export default function Navlinks({ user }: NavlinksProps) {
   const { walletData, disconnectWallet } = useWallet();
   const [showDisconnectMenu, setShowDisconnectMenu] = useState(false);
 
-  console.log({ profile });
-
   const handleWalletClick = () => {
     if (walletData) {
       setShowDisconnectMenu(!showDisconnectMenu);
@@ -41,6 +39,14 @@ export default function Navlinks({ user }: NavlinksProps) {
   return (
     <div className="relative flex flex-col justify-between py-4 align-center md:py-6 h-full">
       <div className="flex flex-col items-center flex-1">
+        <p className='flex gap-2'>
+          <span className="text-2xl font-bold gradient-text font-display text-white">
+                AURION
+              </span>
+              <span className="hidden sm:inline-flex bg-accent/20 text-accent text-xs px-2 py-1 rounded border border-accent/30">
+                Alpha
+              </span>
+        </p>
         <Link href="/" className={s.logo} aria-label="Logo">
           <Logo />
         </Link>

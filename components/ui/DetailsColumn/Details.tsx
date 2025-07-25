@@ -10,6 +10,7 @@ import { MatchmakingButtons } from '../Queue/QueueManagerList';
 import { useChessVsBot } from '@/contexts/GameBot';
 import { createClient } from '@/utils/supabase/client';
 import { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
+import { useWallet } from '@/contexts/WalletContext';
 
 type Props = {
   matchCode?: string;
@@ -38,18 +39,11 @@ function getTimeUntilFriday() {
 
 export default function DetailsColumn({ matchCode }: Props) {
   let { game, playerColor } = useMatch();
-  const [timeLeft, setTimeLeft] = useState(getTimeUntilFriday());
   const supabase = createClient()
   
   const [activeTab, setActiveTab] = useState('newMatch');
-  const { user } = useAuth();
+  const { user } = useWallet();
 
-   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(getTimeUntilFriday());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
 
   return (
@@ -93,56 +87,30 @@ export default function DetailsColumn({ matchCode }: Props) {
         {activeTab === 'newMatch' && (
           <div className="col-span-6 space-y-4">
             <div className="rounded-lg p-4 overflow-hidden inset-0 bg-gradient-to-r from-primary/10 to-secondary/10">
-              {user ? (
+              { user ? (
                 <>
-                  <h2 className="text-xl font-bold mb-2">Welcome, {user.email}</h2>
-                  <p className="text-zinc-400 mb-4">Choose your game:</p>
-                  <Suspense fallback={<div>Loading queue manager...</div>}>
-                    {/* <QueueManager /> */}
-                    <MatchmakingButtons />
-                  </Suspense>
+                  <div className="flex flex-col items-center justify-center gap-4 p-4">
+                    <h2 className="text-5xl font-bold mb-2 text-center">A new era of Chess begins</h2>
+                    <p className="text-md font-bold mb-2">Chosse your ticket and go to the WARR!!!!</p>
+                    <div className="flex flex-row gap-2">
+                      <Suspense fallback={<div>Loading queue manager...</div>}>
+                        {/* <QueueManager /> */}
+                        <MatchmakingButtons />
+                      </Suspense>
+                    </div>
+                  </div>
                 </>
               ) : (
                 
                 <div className="flex flex-col items-center justify-center gap-4 p-4">
                   <h2 className="text-5xl font-bold mb-2 text-center">A new era of Chess begins</h2>
                   <p className="text-md font-bold mb-2">Connect your wallet. The warriors are coming.</p>
-                  <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
-                    <div className="flex flex-col">
-                      <span className="countdown font-mono text-4xl">
-                        <span style={{ "--value": timeLeft.days } as React.CSSProperties}></span>
-                      </span>
-                      <span className="text-sm">days</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="countdown font-mono text-4xl">
-                        <span style={{ "--value": timeLeft.hours } as React.CSSProperties}></span>
-                      </span>
-                      <span className="text-sm">hours</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="countdown font-mono text-4xl">
-                        <span style={{ "--value": timeLeft.minutes } as React.CSSProperties}></span>
-                      </span>
-                      <span className="text-sm">min</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="countdown font-mono text-4xl">
-                        <span style={{ "--value": timeLeft.seconds } as React.CSSProperties}></span>
-                      </span>
-                      <span className="text-sm">sec</span>
-                    </div>
-                  </div>
                   <div className="flex flex-row gap-2">
-                    <p className="btn linkDisable relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default">
-                      🌎 0.00005 BTC
-                    </p>
-                    <p className="btn linkDisable relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default">
-                      🌎 0.0001 BTC
-                    </p>
-                    <p className="btn linkDisable relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default">
-                      🌎 0.0005 BTC
-                    </p>
+                    <div className="flex gap-2">
+                      <button className='btn relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-pointer'>0.00001 Aurion</button>
+                      <button className='btn relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-pointer'>0.00005 Aurion</button>
+                      <button className='btn relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-pointer'>0.00010 Aurion</button>
+                    </div>
                   </div>
                 </div>
               )}

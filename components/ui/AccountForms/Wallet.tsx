@@ -19,10 +19,8 @@ export default function WalletInterface() {
   const handleConfirm = () => {
     if (activeTab === 'deposit') {
       // Lógica de depósito aqui
-      console.log(`Depositing ${amount} BTC`);
     } else if (activeTab === 'withdraw') {
       // Lógica de saque aqui
-      console.log(`Withdrawing ${amount} BTC to ${address}`);
     }
   };
 

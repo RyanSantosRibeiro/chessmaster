@@ -55,7 +55,6 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
 
       const accounts = await provider.requestAccounts();
       const address = accounts[0];
-      console.log('address ', address);
 
       if (!address) {
         throw new Error('0 account found');
@@ -64,7 +63,6 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
       const message = `Connect to Aurion! \n\nAddress: ${address}}`;
       
       const signature = await provider.signMessage(message);
-      console.log('sign ', signature);
 
       if (!signature) {
         throw new Error('sign fail');

@@ -78,10 +78,8 @@ export default function GameRoom() {
       config: { presence: { key: user.id } }
     });
 
-    console.log({ broadcast: `match-${matchId}` });
     channel
       .on('broadcast', { event: 'new-move' }, ({ payload }) => {
-        console.log('broadcast---> NEW MOVE');
         const move = payload.move;
         if (!gameRef?.current) return;
 
