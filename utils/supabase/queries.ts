@@ -87,3 +87,36 @@ export const createMatch = async (payload: any) => {
       return error;
     } 
 }
+
+export const getScoreboard = async () => {
+  try {
+      const response = await fetch(`/api/scoreboard`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+
+      return result.data;
+    } catch (error: any) {
+      return error;
+    } 
+}
+
+export const updateMatch = async (payload: any) => {
+  try {
+      const response = await fetch(`/api/match/result`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+
+      return result.data;
+    } catch (error: any) {
+      return error;
+    } 
+}

@@ -15,6 +15,7 @@ export interface UserData {
   username: string;
   trophies: number;
   level: number;
+  match: any;
 }
 
 interface WalletContextType {
@@ -46,12 +47,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             setWalletDataState(parsedWallet);
             console.log('🔄 Wallet carregada do localStorage e validada:', parsedWallet.address);
           } else {
-            localStorage.removeItem(WALLET_STORAGE_KEY);
+            // localStorage.removeItem(WALLET_STORAGE_KEY);
+             console.log("Remove local storage")
           }
         }
       } catch (error) {
         console.error('erfro', error);
-        localStorage.removeItem(WALLET_STORAGE_KEY);
+        // localStorage.removeItem(WALLET_STORAGE_KEY);
+         console.log("Remove local storage")
       } finally {
         setIsInitialized(true);
       }
@@ -87,7 +90,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       }
     } else {
       try {
-        localStorage.removeItem(WALLET_STORAGE_KEY);
+        // localStorage.removeItem(WALLET_STORAGE_KEY);
+         console.log("Remove local storage")
       } catch (error) {
         console.error('erro', error);
       }

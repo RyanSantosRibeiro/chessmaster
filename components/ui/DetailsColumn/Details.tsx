@@ -11,9 +11,10 @@ import { useChessVsBot } from '@/contexts/GameBot';
 import { createClient } from '@/utils/supabase/client';
 import { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
 import { useWallet } from '@/contexts/WalletContext';
+import LoadingDots from '../LoadingDots';
 
 type Props = {
-  matchCode?: string;
+  defaultTab?: string;
 };
 
 function getTimeUntilFriday() {
@@ -37,17 +38,20 @@ function getTimeUntilFriday() {
   return { days, hours, minutes, seconds };
 }
 
-export default function DetailsColumn({ matchCode }: Props) {
-  let { game, playerColor } = useMatch();
-  const supabase = createClient()
-  
-  const [activeTab, setActiveTab] = useState('newMatch');
+export default function DetailsColumn({ defaultTab }: Props) {
   const { user } = useWallet();
+  let { game, playerColor } = useMatch();
+  const [activeTab, setActiveTab] = useState<string>(defaultTab ? defaultTab : "newMatch");
 
-
+  
+  if(!user) return (
+    <div className="card bg-base-100 w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden lg:min-w-[350px] max-w-[400px] overflow-hidden">  
+      <LoadingDots />
+    </div>
+  )
 
   return (
-    <div className="card bg-base-100 w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden">
+    <div className="card bg-base-100 w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden lg:min-w-[350px] max-w-[400px]">  
       <div className="tabs tabs-boxed flex flex-nowrap">
         {/* <a className={`p-2 w-full tab ${activeTab === 'statistic' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
           onClick={() => setActiveTab('match')}
@@ -60,13 +64,11 @@ export default function DetailsColumn({ matchCode }: Props) {
         >
           Statistic
         </a>
-        {!game && (
-          <a className={`p-2 w-full tab ${activeTab === 'newMatch' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
-          onClick={() => setActiveTab('newMatch')}
+        <a className={`p-2 w-full tab ${activeTab === 'newMatch' ? 'tab-active text-white bg-base-100' : '!text-gray-500 bg-base-300'}`}
+          onClick={() => game ? null : setActiveTab('newMatch')}
         >
           New Match
         </a>
-        )}
       </div>
 
       <div className="card-body flex-1 overflow-y-auto p-4 rounded-[10px_10px_0_0] bg-base-100">
@@ -90,7 +92,7 @@ export default function DetailsColumn({ matchCode }: Props) {
               { user ? (
                 <>
                   <div className="flex flex-col items-center justify-center gap-4 p-4">
-                    <h2 className="text-5xl font-bold mb-2 text-center">A new era of Chess begins</h2>
+                    <h2 className="text-3xl font-bold mb-2 text-center">A new era of Chess begins</h2>
                     <p className="text-md font-bold mb-2">Chosse your ticket and go to the WARR!!!!</p>
                     <div className="flex flex-row gap-2">
                       <Suspense fallback={<div>Loading queue manager...</div>}>
@@ -103,7 +105,7 @@ export default function DetailsColumn({ matchCode }: Props) {
               ) : (
                 
                 <div className="flex flex-col items-center justify-center gap-4 p-4">
-                  <h2 className="text-5xl font-bold mb-2 text-center">A new era of Chess begins</h2>
+                  <h2 className="text-3xl font-bold mb-2 text-center">A new era of Chess begins</h2>
                   <p className="text-md font-bold mb-2">Connect your wallet. The warriors are coming.</p>
                   <div className="flex flex-row gap-2">
                     <div className="flex gap-2">
@@ -121,9 +123,6 @@ export default function DetailsColumn({ matchCode }: Props) {
             </div>
           </div>
         )}
-      </div>
-      <div className="h-auto flex flex-col">
-            <MatchRoomChat matchId={matchCode || "bot"} />
       </div>
     </div>
   );

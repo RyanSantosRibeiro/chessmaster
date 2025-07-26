@@ -28,7 +28,7 @@ export default function PlayPage() {
         <ChessVsBot />
       </div>
       <DetailsColumn />
-      {/* <ComunityColumn /> */}
+      <ComunityColumn />
     </div>
   );
 }

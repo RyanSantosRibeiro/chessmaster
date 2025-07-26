@@ -28,9 +28,22 @@ export const POST = async (req: Request) => {
   }
 
   if(data && data != null) {
+    const { data: verifyMatch, error: verifyMatchError } = await supabase
+      .from("matches")
+      .select(`
+        *,
+        white_player:users!matches_white_player_id_fkey (*),
+        black_player:users!matches_black_player_id_fkey (*)
+      `)
+      .or(`white_player_id.eq.${data.id},black_player_id.eq.${data.id}`)
+      .eq("status", "in_progress")
+      .single();
+
+      console.log({verifyMatch, verifyMatchError, data})
+
     return new Response(JSON.stringify({
       success: true,
-      user: data,
+      user: {...data, match: verifyMatch},
       message: "Wallet connected"
     }), {
       status: 200,

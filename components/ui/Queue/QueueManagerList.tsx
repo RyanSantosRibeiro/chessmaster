@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Button from '../Button';
 import LoadingDots from '../LoadingDots';
@@ -18,6 +18,13 @@ export function MatchmakingButtons() {
   const [channel, setChannel] = useState<any>(null);
   const { user } = useWallet();
   const router = useRouter();
+
+  useEffect(() => {
+    if (user?.match?.url_hash) {
+      // alert("Você já está em uma partida")
+      // router.push(`/play/${user?.match?.url_hash}`);
+    }
+  }, [user]);
 
   const joinQueue = async (ticket: number) => {
     if (!user) return;
@@ -73,17 +80,18 @@ export function MatchmakingButtons() {
 
           if (isResponsible) {
             try {
-
+              console.log('🟢🟢 Criando partida 🟢🟢');
               // const payment = await transferToken() devtransfer Aqui transfere os tokens ou la no back com o createMatch em api/match/route.js
 
               const reponse = await createMatch({
                 url_hash: matchId,
                 white_player_id,
                 black_player_id,
-                ticket_amount_cents: ticket,
-              })
-              
-              if(!reponse.sucess) return; // PM - Algum erro ao criar partida
+                ticket_amount_cents: ticket
+              });
+
+              console.log({ reponse });
+              if (!reponse.success) return; // PM - Algum erro ao criar partida
 
               await matchmakingChannel.send({
                 type: 'broadcast',
@@ -97,8 +105,8 @@ export function MatchmakingButtons() {
               });
 
               await cleanup();
-              console.log("🟢🟢 Partida encontrada 🟢🟢")
-              // router.push(`/play/match/${matchId}`); Descomentar
+
+              router.push(`/play/${matchId}`);
             } catch (err) {
               console.error('Erro ao criar partida:', err);
               await cleanup();
@@ -115,8 +123,8 @@ export function MatchmakingButtons() {
 
           if (!players.includes(user.id)) return; // Ignora se não for pra You
           await cleanup();
-          console.log("🟢🟢 broadcast - Partida encontrada 🟢🟢")
-          // router.push(`play/match/${matchId}`); Descomentar
+          console.log('🟢🟢 broadcast - Partida encontrada 🟢🟢');
+          router.push(`play/${matchId}`);
         }
       )
       .on('presence', { event: 'join' }, ({ key, newPresences }) => {
@@ -152,9 +160,24 @@ export function MatchmakingButtons() {
     <div className="space-y-4">
       {!inQueue ? (
         <div className="flex gap-2">
-          <button onClick={() => joinQueue(1)} className='btn relative transition-all duration-150 py-2 font-semibold rounded px-2 cursor-pointer'>Play $1</button>
-          <button onClick={() => joinQueue(5)} className='btn relative transition-all duration-150 py-2 font-semibold rounded px-2 cursor-pointer'>Play $5</button>
-          <button onClick={() => joinQueue(10)} className='btn relative transition-all duration-150 py-2 font-semibold rounded px-2 cursor-pointer'>Play $10</button>
+          <button
+            onClick={() => joinQueue(1)}
+            className="btn relative transition-all duration-150 py-2 font-semibold rounded px-2 cursor-pointer"
+          >
+            Play $1
+          </button>
+          <button
+            onClick={() => joinQueue(5)}
+            className="btn relative transition-all duration-150 py-2 font-semibold rounded px-2 cursor-pointer"
+          >
+            Play $5
+          </button>
+          <button
+            onClick={() => joinQueue(10)}
+            className="btn relative transition-all duration-150 py-2 font-semibold rounded px-2 cursor-pointer"
+          >
+            Play $10
+          </button>
         </div>
       ) : (
         <div className="text-center">

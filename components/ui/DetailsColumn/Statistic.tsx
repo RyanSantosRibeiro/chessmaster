@@ -1,18 +1,22 @@
 'use client';
 
 import { useChessVsBot } from '@/contexts/GameBot';
+import { useMatch } from '@/contexts/MatchContext';
 import { useEffect, useRef, useState } from 'react';
 
 export default function StatisticColumn() {
   const { moveHistory: moveHistoryBot } = useChessVsBot();
+  const { history } = useMatch();
   const [filter, setFilter] = useState<'all' | 'white' | 'black'>('all');
   const bottomRef = useRef<HTMLDivElement>(null);
+  const currentHistory = history?.length > 0 ? history : moveHistoryBot;
+
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [moveHistoryBot]);
 
-  const filteredMoves = moveHistoryBot.filter((move) => {
+  const filteredMoves = currentHistory.filter((move) => {
     if (filter === 'all') return true;
     return move.color === (filter === 'white' ? 'w' : 'b');
   });
@@ -39,7 +43,9 @@ export default function StatisticColumn() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-2 text-white text-sm">
-        {filteredMoves.map((move, index) => (
+        {filteredMoves.map((data, index) => {
+          const { move } = data;
+          return (
           <div
             key={index}
             className={`flex justify-between p-2 rounded ${
@@ -51,7 +57,8 @@ export default function StatisticColumn() {
               {move.color === 'w' ? '♙' : '♟'} {move.san}
             </span>
           </div>
-        ))}
+        )
+        })}
         <div ref={bottomRef} />
       </div>
     </div>

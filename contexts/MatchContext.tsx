@@ -1,9 +1,17 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { Chess, Color, Piece, PieceSymbol, Square } from 'chess.js';
 import { createClient } from '@/utils/supabase/client';
 import { BoardOrientation } from 'react-chessboard/dist/chessboard/types';
+import { updateMatch } from '@/utils/supabase/queries';
 
 export type PlayerTime = {
   white: number;
@@ -14,9 +22,13 @@ export type MatchContextType = ReturnType<typeof useMatchProvider>;
 
 const MatchContext = createContext<MatchContextType | undefined>(undefined);
 
-export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({
+  children
+}) => {
   const value = useMatchProvider();
-  return <MatchContext.Provider value={value}>{children}</MatchContext.Provider>;
+  return (
+    <MatchContext.Provider value={value}>{children}</MatchContext.Provider>
+  );
 };
 
 export const useMatch = () => {
@@ -29,67 +41,97 @@ export const useMatch = () => {
 
 function useMatchProvider() {
   const initialTime = {
-    white: 100, // 5 min
-    black: 100,
+    white: 200, // 5 min
+    black: 200
   };
   const [match, setMatch] = useState<any | null>(null);
+  const [history, setHistory] = useState<any[]>([]);
   const [game, setGame] = useState<Chess | null>(null);
-  const [visualPosition, setVisualPosition] = useState(null); 
   const [level, setLevel] = useState(3);
   const [isPaused, setIsPaused] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
   const [firstMove, setFirstMove] = useState(false);
-  const [playerColor, setPlayerColor] = useState<BoardOrientation>('white');
+  const [playerColor, setPlayerColor] = useState<Color>('w');
   const [markedSquares, setMarkedSquares] = useState<Set<string>>(new Set());
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
   const [possibleMoves, setPossibleMoves] = useState<string[]>([]);
-  const [movePreview, setMovePreview] = useState<{ from: string; to: string }[]>([]);
+  const [movePreview, setMovePreview] = useState<
+    { from: string; to: string }[]
+  >([]);
   const chessboardRef = useRef<any>(null);
-  const [time, setTime] = useState<PlayerTime>({ white: initialTime.white, black: initialTime.black });
+  const [time, setTime] = useState<PlayerTime | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const stockfish = useRef<Worker | null>(null);
-  const supabase = createClient();
-  const [channel, setChannel] = useState<any>(null);
-  const [hasStarted, setHasStarted] = useState(false);
   const [startTimestamp, setStartTimestamp] = useState<number | null>(null);
-  
+  const supabase = createClient();
 
   function changeFenTurn(fen: string, newTurn: 'white' | 'black'): string {
     const parts = fen.split(' ');
-    if (parts.length < 2) throw new Error("FEN inválido");
+    if (parts.length < 2) throw new Error('FEN inválido');
     parts[1] = newTurn;
     return parts.join(' ');
   }
 
-  // Recebe jogada do outro
+  const sendWinner = async (winner: string) => {
+    if (!match || !winner || winner == null) return;
+
+    try {
+      const payload = {
+        winner: winner == 'w' ? match.white_player_id : match.black_player_id,
+        match: match.id,
+        fen: game?.fen(),
+        status: "completed",
+        completed_at: new Date().toISOString()
+      }
+      const response = await updateMatch(payload)
+
+      if(!response.ok)
+        throw new Error("Error on update match")
+    } catch (error) {
+        console.log("Error on update match", error)
+    }
+  }
 
   // Timer
   useEffect(() => {
-  if (!hasStarted || !startTimestamp || game == null || game.isGameOver() || winner) return;
+    if (!startTimestamp || !game || game.isGameOver() || winner || time == null || !hasStarted)
+      return;
 
-  timerRef.current = setInterval(() => {
-    const now = Date.now();
-    const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
+    let lastUpdate = Date.now();
 
-    setTime((prev) => {
-      const currentTurn = game.turn() === 'white' as Color ? 'white' : 'black';
-      const timeLeft = Math.max(initialTime[currentTurn] - elapsedSeconds, 0);
+    timerRef.current = setInterval(() => {
+      const now = Date.now();
+      const delta = Math.floor((now - lastUpdate) / 1000);
 
-      if (timeLeft === 0 && !winner) {
-        setWinner(currentTurn === 'white' ? 'black' : 'white');
-        clearInterval(timerRef.current!);
+      if (delta > 0) {
+        lastUpdate = now;
+        setTime((prev) => {
+          const currentTurn =
+            game.turn() === ('w' as Color) ? 'white' : 'black';
+          const newTime = Math.max(prev[currentTurn] - delta, 0);
+
+          if (newTime === 0 && !winner) {
+            console.log({winnerD: currentTurn === 'white' ? 'b' : '2'})
+            setWinner(currentTurn === 'white' ? 'b' : 'w');
+            clearInterval(timerRef.current!);
+          }
+
+          return {
+            ...prev,
+            [currentTurn]: newTime
+          };
+        });
       }
+    }, 1000);
 
-      return {
-        ...prev,
-        [currentTurn]: timeLeft,
-      };
-    });
-  }, 1000);
+    return () => clearInterval(timerRef.current!);
+  }, [game, winner, startTimestamp,hasStarted]);
 
-  return () => clearInterval(timerRef.current!);
-}, [hasStarted, startTimestamp, game, winner]);
-
+  // Timer
+  useEffect(() => {
+    if (winner == null) return;
+    sendWinner(winner)
+  }, [winner]);
 
 
 
@@ -106,113 +148,195 @@ function useMatchProvider() {
   }
 
   function onPieceDragged(piece: string, square: Square) {
-    if(!game) return;
+    if (!game) return;
     if (selectedSquare && possibleMoves.includes(square)) {
       setSelectedSquare(null);
       setPossibleMoves([]);
     } else {
       try {
-        const clone = new Chess(changeFenTurn(game.fen(), playerColor))
+        const clone = new Chess(
+          game.fen()
+        );
+
+        console.log('--------------------');
 
         const moves = clone.moves({ square, verbose: true });
-          if (moves?.length > 0) {
-            setSelectedSquare(square);
-            setPossibleMoves(moves.map((m) => m.to));
-          } else {
-            setSelectedSquare(null);
-            setPossibleMoves([]);
-          }
-        } catch (error) {
-          console.log(error)
+        if (moves?.length > 0) {
+          setSelectedSquare(square);
+          setPossibleMoves(moves.map((m) => m.to));
+        } else {
+          setSelectedSquare(null);
+          setPossibleMoves([]);
         }
+      } catch (error) {
+        console.log('onPieceDragged:', error);
       }
+    }
   }
 
   const customSquareStyles = useMemo(() => {
     const styles: { [square: string]: React.CSSProperties } = {};
     for (const sq of possibleMoves) {
       styles[sq] = {
-        backgroundColor: 'rgba(34,197,94,0.4)', // bg-green-500/40
+        backgroundColor: 'rgba(34,197,94,0.4)' // bg-green-500/40
       };
     }
     for (const mv of movePreview) {
       styles[mv.to] = {
-        backgroundColor: 'rgba(234,179,8,0.2)', // yellow highlight
+        backgroundColor: 'rgba(234,179,8,0.2)' // yellow highlight
       };
     }
     for (const sq of Array.from(markedSquares)) {
       styles[sq] = {
-        backgroundColor: 'rgba(239, 68, 68, 0.5)', // vermelho bg-red-500/50
+        backgroundColor: 'rgba(239, 68, 68, 0.5)' // vermelho bg-red-500/50
       };
     }
-  
+
     return styles;
   }, [possibleMoves, movePreview, markedSquares]);
 
-  const makeMove = (sourceSquare:Square, targetSquare:Square,piece:any) => {
-    if(!game) return false;
-    if(piece[0] != playerColor) return false;
+  const saveMove = async ({
+    player_id,
+    match_id,
+    move,
+    timestamp,
+    fen,
+    time_left
+  }: {
+    player_id: string;
+    match_id: string;
+    move: any;
+    timestamp: string;
+    fen: string;
+    time_left: number;
+  }) => {
+    try {
+      const { data: saveMove } = await supabase
+        // @ts-ignore
+        .from('match_moves')
+        .insert({
+          player_id,
+          match_id,
+          move,
+          timestamp,
+          fen,
+          time_left
+        });
+    } catch (error) {
+      console.log('Error on send move:', error);
+    }
+  };
+
+  const addToHistory = ({
+    player_id,
+    match_id,
+    move,
+    timestamp,
+    fen,
+    time_left
+  }: {
+    player_id: string;
+    match_id: string;
+    move: any;
+    timestamp: string;
+    fen: string;
+    time_left: number;
+  }) => {
+    setHistory((prev) => [
+      {
+        player_id,
+        match_id,
+        move,
+        timestamp,
+        fen,
+        time_left
+      },
+      ...prev
+    ]);
+  };
+
+
+  const makeMove = (sourceSquare: Square, targetSquare: Square, piece: any) => {
+    console.log('Make Move: On');
+    if (!game) return false;
+    if (piece[0] != playerColor) return false;
     if (isPaused || game.isGameOver() || winner) return false;
     if (!firstMove) setFirstMove(true);
     const move = {
       from: sourceSquare,
       to: targetSquare,
-      promotion: "q", // promoção automática para rainha
+      promotion: 'q' // promoção automática para rainha
     };
     try {
-
+      const currentTurn = game.turn() === ('w' as Color) ? 'white' : 'black';
       const result = game.move(move);
+      console.log({ move });
       if (result === null) return false; // movimento ilegal
-      const newGame = new Chess(game.fen())
+      const newGame = new Chess(game.fen());
+      
       setGame(newGame); // atualiza o estado do jogo
-      sendMove(newGame.fen())
+      sendMove(newGame.fen());
+      console.log({sendtime: time[currentTurn],time})
+      const payload = {
+        player_id:
+          playerColor == 'w' ? match?.white_player_id : match?.black_player_id,
+        match_id: match?.id,
+        move: result,
+        timestamp: new Date().toISOString(),
+        fen: game.fen(),
+        time_left: time ? time[currentTurn] : 0
+      }
+      saveMove(payload);
+      addToHistory(payload);
+
       return true;
     } catch (error) {
       console.log('Erro ao tentar mover peça:', error);
       return false;
     }
-
   };
 
-
   // Cria Coneção
-     useEffect(() => {
-      if(!match) return;
-      const channel = supabase.channel(`match-${match.url_hash}`, {
-        config: {
-          broadcast: {
-            self: true,
-          },
-        },
-      });
-  
-      channel
-        .on('broadcast', { event: 'chat-message' }, (payload) => {
-          console.log( {payload})
-          const newGame = new Chess(payload.payload.fen)
-          setGame(newGame); // atualiza o estado do jogo
-          setTime(payload.payload.timeLeft)
-          // if(playerColor == "w") {
-          //   if(time.white != payload.payload.timeLeft) {
-          //     setTime({black: time.black, white: payload.payload.timeLeft})
-          //     }
-          // } else {
-          //   if(time.black != payload.payload.timeLeft) {
-          //     setTime({white: time.white, black: payload.payload.timeLeft})
-          //     }
-          // }
-        })
-        .subscribe();
-  
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }, [match]);
+  useEffect(() => {
+    if (!match) return;
+    const channel = supabase.channel(`match-${match.url_hash}`, {
+      config: {
+        broadcast: {
+          self: true
+        }
+      }
+    });
 
-  const sendMove = async (fen:any) => {
-    console.log("Send", fen)
-    if(!match) return;
-    const channel = supabase.getChannels().find((c) => c.topic === `realtime:match-${match.url_hash}`);
+    channel
+      .on('broadcast', { event: 'chat-message' }, (payload) => {
+        console.log({ payload });
+        const newGame = new Chess(payload.payload.fen);
+        setGame(newGame); // atualiza o estado do jogo
+        setTime(payload.payload.time)
+        // setTime(payload.payload.timeLeft);
+        // if(playerColor == "w") {
+        //   if(time.white != payload.payload.timeLeft) {
+        //     setTime({black: time.black, white: payload.payload.timeLeft})
+        //     }
+        // } else {
+        //   if(time.black != payload.payload.timeLeft) {
+        //     setTime({white: time.white, black: payload.payload.timeLeft})
+        //     }
+        // }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [match]);
+
+  const sendMove = async (fen: any) => {
+    console.log('Send', fen);
+    if (!match) return;
+    const channel = supabase
+      .getChannels()
+      .find((c) => c.topic === `realtime:match-${match.url_hash}`);
 
     if (channel) {
       await channel.send({
@@ -220,21 +344,21 @@ function useMatchProvider() {
         event: 'chat-message',
         payload: {
           fen,
-          timeLeft: time
-        },
+          time
+        }
       });
     }
   };
-
-
 
   // Controle
   const pause = () => {
     // const newGame = new Chess("rnb1kbnr/pppp1Qpp/8/4p3/8/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4");
     // const newGame = new Chess("8/8/8/8/8/8/8/K1k5 w - - 0 1");
-    const newGame = new Chess("rnb1kbnr/pppp1ppp/8/4p3/4q3/5P2/PPPP2PP/RNBQKBNR w KQkq - 0 4");
-    console.log({newGame: newGame?.isGameOver() || Boolean(winner), winner})
-    setGame(newGame)
+    const newGame = new Chess(
+      'rnb1kbnr/pppp1ppp/8/4p3/4q3/5P2/PPPP2PP/RNBQKBNR w KQkq - 0 4'
+    );
+    console.log({ newGame: newGame?.isGameOver() || Boolean(winner), winner });
+    setGame(newGame);
     // setIsPaused(true);
     // clearInterval(timerRef.current!);
   };
@@ -245,7 +369,7 @@ function useMatchProvider() {
 
   const restart = () => {
     // const newGame = new Chess();
-    chessboardRef.current?.clearPremoves()
+    chessboardRef.current?.clearPremoves();
     // setFirstMove(false);
     // setGame(newGame);
     // setFen(newGame.fen());
@@ -257,17 +381,20 @@ function useMatchProvider() {
 
   return {
     match,
-    startTimestamp, setStartTimestamp,
-    hasStarted, setHasStarted,
+    startTimestamp,
+    setHistory,
+    setStartTimestamp,
     playerColor,
+    history,
+    setTime,
     setPlayerColor,
     setMatch,
+    setHasStarted,
     chessboardRef,
     setGame,
     game,
-    fen: game?.fen(),
     makeMove,
-    isPlayerTurn: game?.turn() == playerColor as Color ? true : false,
+    isPlayerTurn: game?.turn() == (playerColor as Color) ? true : false,
     isPaused,
     gameOver: game?.isGameOver() || Boolean(winner),
     turn: game?.turn(),
@@ -278,7 +405,9 @@ function useMatchProvider() {
     level,
     time,
     winner,
-    markedSquares, setMarkedSquares,onSquareRightClick,
+    markedSquares,
+    setMarkedSquares,
+    onSquareRightClick,
     moveHistory: game?.history({ verbose: true }),
     onPieceDragged,
     possibleMoves,
