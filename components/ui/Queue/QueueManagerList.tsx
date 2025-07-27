@@ -66,15 +66,26 @@ export function MatchmakingButtons() {
             p.ticket_amount_cents === ticket
         );
 
+        console.log({match})
+
         if (match) {
           console.log('Match!!');
           hasMatched = true;
           // @ts-ignore
-          const isUserWhite = user.trophies <= match.trophies;
+          let isUserWhite = null;
+
+          if(user.trophies == match.trophies) {
+            isUserWhite = user.id < match.user_id
+
+            console.log({s:"São iguais",isUserWhite, u: user.id, m: match.user_id} )
+          } else {
+            isUserWhite = user.trophies < match.trophies
+          }
           // @ts-ignore
           const white_player_id = isUserWhite ? user.id : match.user_id;
           // @ts-ignore
           const black_player_id = isUserWhite ? match.user_id : user.id;
+          console.log({white_player_id, black_player_id})
           const isResponsible = isUserWhite;
           const matchId = generateMatchId();
 
@@ -105,8 +116,9 @@ export function MatchmakingButtons() {
               });
 
               await cleanup();
+              console.log("Redirecionando")
 
-              router.push(`/play/${matchId}`);
+              // router.push(`/play/${matchId}`);
             } catch (err) {
               console.error('Erro ao criar partida:', err);
               await cleanup();
@@ -124,7 +136,8 @@ export function MatchmakingButtons() {
           if (!players.includes(user.id)) return; // Ignora se não for pra You
           await cleanup();
           console.log('🟢🟢 broadcast - Partida encontrada 🟢🟢');
-          router.push(`play/${matchId}`);
+          console.log("Redirecionando")
+          // router.push(`play/${matchId}`);
         }
       )
       .on('presence', { event: 'join' }, ({ key, newPresences }) => {
