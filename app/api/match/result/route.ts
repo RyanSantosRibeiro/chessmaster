@@ -59,7 +59,7 @@ export const POST = async (req: Request) => {
       status,
       completed_at: new Date().toISOString()
     })
-    .eq('id', match);
+    .eq('id', match); 
 
   const { data: winnerPLayer, error: winnerPlayerError } = await supabase
     .from('users')
@@ -77,7 +77,9 @@ export const POST = async (req: Request) => {
 
   const odinPlataform = await JSON.parse(process.env.ODIN_PLATAFORM as string)
   // console.log({odinPlataform})
-  const reward = (verifyMatch.ticket_amount * 2) * 0.8;
+  const reward = (verifyMatch.match_type.ticket_amount * 2) * 0.8;
+
+  console.log({reward, verifyTicket: verifyMatch.match_type.ticket_amount})
 
   const payment = await transferToken(
     odinPlataform,

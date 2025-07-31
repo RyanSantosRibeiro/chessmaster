@@ -40,12 +40,10 @@ export default function GameStatus({ result, stats }: Props) {
           <div className="text-5xl mb-2">❌</div>
           <h2 className="text-3xl font-bold mb-2">Defeat</h2>
           <p className="text-lg mb-4">You’ve won this battle… rise stronger!</p>
-          <button
-            className="btn btn-sm btn-warning"
-            onClick={() => window.location.reload()}
-          >
-            Play again
-          </button>
+          <Link href="/play" className="btn btn-sm btn-primary">
+            {' '}
+            Play Again
+          </Link>
         </div>
       </div>
     );

@@ -107,17 +107,17 @@ export function MatchmakingButtons() {
           if (isResponsible) {
             try {
               console.log('🟢🟢 Criando partida 🟢🟢');
-              //  devtransfer Aqui transfere os tokens ou la no back com o createMatch em api/match/route.js
-              // user.odinData
-              const payment = await transferToken(
-                user.odinData,
-                'htsfw-sunm3-lieuo-3gmbn-sogv4-ics5w-zz3ch-ubtpb-rfxxz-q2ufn-wqe',
-                '2k6r',
-                // @ts-ignore
-                type.ticket_amount // 0,000085 -> 8500000
-              );
+              //  comentar em local
 
-              if(!payment.success) throw payment;
+              // const payment = await transferToken(
+              //   user.odinData,
+              //   'htsfw-sunm3-lieuo-3gmbn-sogv4-ics5w-zz3ch-ubtpb-rfxxz-q2ufn-wqe',
+              //   '2k6r',
+              //   // @ts-ignore
+              //   type.ticket_amount // 0,000085 -> 8500000
+              // );
+
+              // if(!payment.success) throw payment;
 
               const reponse = await createMatch({
                 url_hash: matchId,
@@ -217,7 +217,7 @@ export function MatchmakingButtons() {
                     {/* @ts-ignore */}
                     {type?.ticket_amount} Aurions
                   </p>
-                  <p className="m-0 text-[10px] text-[#dbdbdb]">~= ${price.toFixed(2)} Usd</p>
+                  {price ? <p className="m-0 text-[10px] text-[#dbdbdb]">~= ${price.toFixed(2)} Usd</p> : <></>}
 
                   <span
                     className="

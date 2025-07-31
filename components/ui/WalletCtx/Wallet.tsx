@@ -19,7 +19,7 @@ export default function WalletConnect() {
     <div className="p-6 max-w-md mx-auto bg-gray-900 rounded-lg">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-white">
-          Connect Wallet 2
+          Connect Wallet
         </h2>
       </div>
 

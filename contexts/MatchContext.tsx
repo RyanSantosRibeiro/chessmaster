@@ -365,7 +365,7 @@ function useMatchProvider() {
     // const newGame = new Chess("rnb1kbnr/pppp1Qpp/8/4p3/8/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4");
     // const newGame = new Chess("8/8/8/8/8/8/8/K1k5 w - - 0 1");
     const newGame = new Chess(
-      'rnb1kbnr/pppp1ppp/8/4p3/4q3/5P2/PPPP2PP/RNBQKBNR w KQkq - 0 4'
+      'r1bB1b1r/1pp4p/pn4p1/1B2Np2/2P5/1Q2kP2/PP2N1PP/R3K2R b KQ - 2 17'
     );
     setGame(newGame);
     // setIsPaused(true);

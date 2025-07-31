@@ -12,7 +12,6 @@ export default function StatisticColumn() {
   const currentHistory = history?.length > 0 ? history : moveHistoryBot;
 
   const filteredMoves = currentHistory.filter(({move}) => {
-    console.log({filter: move})
     if (filter === 'all') return true;
     return move.color === (filter === 'white' ? 'w' : 'b');
   });

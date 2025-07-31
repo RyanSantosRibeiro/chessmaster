@@ -234,9 +234,9 @@ export default function ChessMultiplayer() {
         <div className="w-auto h-full aspect-square relative rounded-sm overflow-hidden bg-[#121c22] flex">
           <GameStatus
             stats={{
-              trophies: opponent?.trophies,
+              trophies: match?.match_type?.trophies_on_win,
               level: opponent?.level,
-              token: opponent?.token
+              token: (match?.match_type?.ticket_amount * 2 ) * 0.8,
             }}
             result={
               result == null ? null :
