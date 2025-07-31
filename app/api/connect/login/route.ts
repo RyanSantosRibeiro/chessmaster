@@ -8,7 +8,7 @@ import { login } from '@/utils/odin/login';
 
 export const POST = async (req: Request) => {
   const body = await req.json();
-  const {
+  const { 
         address,
         signature,
         publicKey,
