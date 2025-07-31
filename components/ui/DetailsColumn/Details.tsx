@@ -47,7 +47,7 @@ export default function DetailsColumn({ defaultTab }: Props) {
 
 
   return (
-    <div className="card bg-[#1b262c] w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden lg:min-w-[350px] max-w-[400px]">
+    <div className="card bg-[#1b262c] w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden 2xl:min-w-[350px] min-w-[25%] max-w-[400px]">
       <div className="tabs tabs-boxed flex flex-nowrap">
         {/* <a className={`p-2 w-full tab ${activeTab === 'statistic' ? 'tab-active text-white bg-[#1b262c]' : '!text-gray-500 bg-[#121c22]'}`}
           onClick={() => setActiveTab('match')}

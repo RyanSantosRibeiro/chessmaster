@@ -29,21 +29,21 @@ export default function Topbar() {
             </div>
           )}
         </div>
-        <p className="font-semibold">
+        <p className="font-semibold text-[10px] 2xl:text-[14px]">
           🎁 Incredible rewards for top 6 holders!
         </p>
       </div>
 
       {/* Update */}
       <div className="h-full flex gap-2 items-center justify-center">
-        <p className="font-semibold">Next update:</p>
-        <p className="bg-[#2cb1c3] p-1 rounded font-bold italic">
+        <p className="font-semibold text-[10px] 2xl:text-[14px]">Next update:</p>
+        <p className="bg-[#2cb1c3] p-1 rounded font-bold italic text-[10px] 2xl:text-[14px]">
           Coliseum - Soon!
         </p>{' '}
         /
         <a
           href="https://odin.fun/token/2k6r"
-          className="bg-[#d65729] p-1 rounded font-bold"
+          className="bg-[#d65729] p-1 rounded font-bold text-[10px] 2xl:text-[14px]"
         >
           Buy Aurion
         </a>

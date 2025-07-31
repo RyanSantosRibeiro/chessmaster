@@ -232,6 +232,12 @@ p a {
   background-size: 200% 100%; 
   animation: ascendFlow 2s linear infinite;
   border-radius: 9999px;
+
+  font-size: 10px;
+
+  @media(min-width: 1570px) {
+    font-size: 14px;
+  }
 }
 
 @keyframes ascendFlow {
