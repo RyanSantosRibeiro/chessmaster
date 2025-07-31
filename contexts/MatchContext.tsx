@@ -40,17 +40,13 @@ export const useMatch = () => {
 };
 
 function useMatchProvider() {
-  const initialTime = {
-    white: 200, // 5 min
-    black: 200
-  };
   const [match, setMatch] = useState<any | null>(null);
   const [history, setHistory] = useState<any[]>([]);
   const [game, setGame] = useState<Chess | null>(null);
   const [level, setLevel] = useState(3);
   const [isPaused, setIsPaused] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
-  const [winner, setWinner] = useState<string | null>(null);
+  const [result, setResult] = useState<string | null>(null);
   const [firstMove, setFirstMove] = useState(false);
   const [playerColor, setPlayerColor] = useState<Color>('w');
   const [markedSquares, setMarkedSquares] = useState<Set<string>>(new Set());
@@ -72,29 +68,35 @@ function useMatchProvider() {
     return parts.join(' ');
   }
 
-  const sendWinner = async (winner: string) => {
-    if (!match || !winner || winner == null) return;
+  const sendResult = async (status: string) => {
+    if (!match || !status || status == null) return;
 
     try {
       const payload = {
-        winner: winner == 'w' ? match.white_player_id : match.black_player_id,
+        winner_id: status == "draw" ? "draw" : status == 'w' ? match.white_player_id : match.black_player_id,
         match: match.id,
         fen: game?.fen(),
-        status: "completed",
+        status: 'completed',
         completed_at: new Date().toISOString()
-      }
-      const response = await updateMatch(payload)
+      };
+      const response = await updateMatch(payload);
 
-      if(!response.ok)
-        throw new Error("Error on update match")
+      if (!response.ok) throw new Error('Error on update match');
     } catch (error) {
-        console.log("Error on update match", error)
+      console.log('Error on update match', error);
     }
-  }
+  };
 
   // Timer
   useEffect(() => {
-    if (!startTimestamp || !game || game.isGameOver() || winner || time == null || !hasStarted)
+    if (
+      !startTimestamp ||
+      !game ||
+      game.isGameOver() ||
+      result ||
+      time == null ||
+      !hasStarted
+    )
       return;
 
     let lastUpdate = Date.now();
@@ -105,14 +107,15 @@ function useMatchProvider() {
 
       if (delta > 0) {
         lastUpdate = now;
+        // @ts-ignore
         setTime((prev) => {
           const currentTurn =
             game.turn() === ('w' as Color) ? 'white' : 'black';
+            // @ts-ignore
           const newTime = Math.max(prev[currentTurn] - delta, 0);
 
-          if (newTime === 0 && !winner) {
-            console.log({winnerD: currentTurn === 'white' ? 'b' : '2'})
-            setWinner(currentTurn === 'white' ? 'b' : 'w');
+          if (newTime === 0 && !result) {
+            setResult(currentTurn === 'white' ? 'b' : 'w');
             clearInterval(timerRef.current!);
           }
 
@@ -125,15 +128,31 @@ function useMatchProvider() {
     }, 1000);
 
     return () => clearInterval(timerRef.current!);
-  }, [game, winner, startTimestamp,hasStarted]);
+  }, [game, result, startTimestamp, hasStarted]);
 
   // Timer
   useEffect(() => {
-    if (winner == null) return;
-    sendWinner(winner)
-  }, [winner]);
+    if (!game || !game.isGameOver()) return;
 
+    // Cheque-mate
+    if (game.isCheckmate()) {
+      const loser = game.turn(); // quem teria jogado agora perdeu
+      const winnerColor = loser === 'w' ? 'b' : 'w';
+      setResult(winnerColor);
+      sendResult(winnerColor);
+      return;
+    }
 
+    // Empates
+    if (game.isStalemate() || game.isDraw() || game.isInsufficientMaterial()) {
+      console.log('Empate');
+      sendResult('draw');
+      return;
+    }
+
+    // Fallback
+    console.warn('Partida finalizada sem resultado definido.');
+  }, [game]);
 
   function onSquareRightClick(square: string) {
     setMarkedSquares((prev) => {
@@ -154,11 +173,7 @@ function useMatchProvider() {
       setPossibleMoves([]);
     } else {
       try {
-        const clone = new Chess(
-          game.fen()
-        );
-
-        console.log('--------------------');
+        const clone = new Chess(game.fen());
 
         const moves = clone.moves({ square, verbose: true });
         if (moves?.length > 0) {
@@ -215,6 +230,7 @@ function useMatchProvider() {
         // @ts-ignore
         .from('match_moves')
         .insert({
+          // @ts-ignore
           player_id,
           match_id,
           move,
@@ -255,12 +271,10 @@ function useMatchProvider() {
     ]);
   };
 
-
   const makeMove = (sourceSquare: Square, targetSquare: Square, piece: any) => {
-    console.log('Make Move: On');
     if (!game) return false;
     if (piece[0] != playerColor) return false;
-    if (isPaused || game.isGameOver() || winner) return false;
+    if (isPaused || game.isGameOver() || result) return false;
     if (!firstMove) setFirstMove(true);
     const move = {
       from: sourceSquare,
@@ -270,13 +284,11 @@ function useMatchProvider() {
     try {
       const currentTurn = game.turn() === ('w' as Color) ? 'white' : 'black';
       const result = game.move(move);
-      console.log({ move });
       if (result === null) return false; // movimento ilegal
       const newGame = new Chess(game.fen());
-      
+
       setGame(newGame); // atualiza o estado do jogo
       sendMove(newGame.fen());
-      console.log({sendtime: time[currentTurn],time})
       const payload = {
         player_id:
           playerColor == 'w' ? match?.white_player_id : match?.black_player_id,
@@ -285,7 +297,7 @@ function useMatchProvider() {
         timestamp: new Date().toISOString(),
         fen: game.fen(),
         time_left: time ? time[currentTurn] : 0
-      }
+      };
       saveMove(payload);
       addToHistory(payload);
 
@@ -309,10 +321,9 @@ function useMatchProvider() {
 
     channel
       .on('broadcast', { event: 'chat-message' }, (payload) => {
-        console.log({ payload });
         const newGame = new Chess(payload.payload.fen);
         setGame(newGame); // atualiza o estado do jogo
-        setTime(payload.payload.time)
+        setTime(payload.payload.time);
         // setTime(payload.payload.timeLeft);
         // if(playerColor == "w") {
         //   if(time.white != payload.payload.timeLeft) {
@@ -332,7 +343,6 @@ function useMatchProvider() {
   }, [match]);
 
   const sendMove = async (fen: any) => {
-    console.log('Send', fen);
     if (!match) return;
     const channel = supabase
       .getChannels()
@@ -357,7 +367,6 @@ function useMatchProvider() {
     const newGame = new Chess(
       'rnb1kbnr/pppp1ppp/8/4p3/4q3/5P2/PPPP2PP/RNBQKBNR w KQkq - 0 4'
     );
-    console.log({ newGame: newGame?.isGameOver() || Boolean(winner), winner });
     setGame(newGame);
     // setIsPaused(true);
     // clearInterval(timerRef.current!);
@@ -396,7 +405,7 @@ function useMatchProvider() {
     makeMove,
     isPlayerTurn: game?.turn() == (playerColor as Color) ? true : false,
     isPaused,
-    gameOver: game?.isGameOver() || Boolean(winner),
+    gameOver: game?.isGameOver() || Boolean(result),
     turn: game?.turn(),
     pause,
     resume,
@@ -404,7 +413,7 @@ function useMatchProvider() {
     setLevel,
     level,
     time,
-    winner,
+    result,
     markedSquares,
     setMarkedSquares,
     onSquareRightClick,

@@ -11,12 +11,8 @@ export default function StatisticColumn() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const currentHistory = history?.length > 0 ? history : moveHistoryBot;
 
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [moveHistoryBot]);
-
-  const filteredMoves = currentHistory.filter((move) => {
+  const filteredMoves = currentHistory.filter(({move}) => {
+    console.log({filter: move})
     if (filter === 'all') return true;
     return move.color === (filter === 'white' ? 'w' : 'b');
   });
@@ -28,16 +24,25 @@ export default function StatisticColumn() {
   };
 
   return (
-    <div className="card bg-base-200 w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden">
+    <div className="card bg-[#121c22] w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden">
       <div className="p-4 flex items-center justify-between border-b border-base-300">
         <span className="text-white font-semibold">Moves</span>
-        <button className="btn btn-sm btn-outline btn-primary" onClick={()=>setFilter("all")}>
+        <button
+          className="btn btn-sm btn-outline btn-primary"
+          onClick={() => setFilter('all')}
+        >
           All
         </button>
-        <button className="btn btn-sm btn-outline btn-[white]" onClick={()=>setFilter("white")}>
+        <button
+          className="btn btn-sm btn-outline btn-[white]"
+          onClick={() => setFilter('white')}
+        >
           White
         </button>
-        <button className="btn btn-sm btn-outline btn-warning" onClick={()=>setFilter("black")}>
+        <button
+          className="btn btn-sm btn-outline btn-warning"
+          onClick={() => setFilter('black')}
+        >
           Black
         </button>
       </div>
@@ -46,18 +51,20 @@ export default function StatisticColumn() {
         {filteredMoves.map((data, index) => {
           const { move } = data;
           return (
-          <div
-            key={index}
-            className={`flex justify-between p-2 rounded ${
-              index % 2 === 0 ? 'bg-base-100' : 'bg-base-300/20'
-            }`}
-          >
-            <span className="text-gray-400">{Math.floor(index / 2) + 1} {move.color === 'w' ? '⬜' : '⬛'}</span>
-            <span>
-              {move.color === 'w' ? '♙' : '♟'} {move.san}
-            </span>
-          </div>
-        )
+            <div
+              key={index}
+              className={`flex justify-between p-2 rounded ${
+                index % 2 === 0 ? 'bg-[#1b262c]' : 'bg-[#121c22]/20'
+              }`}
+            >
+              <span className="text-gray-400">
+                {Math.floor(index / 2) + 1} {move.color === 'w' ? '⬜' : '⬛'}
+              </span>
+              <span>
+                {move.color === 'w' ? '♙' : '♟'} {move.san}
+              </span>
+            </div>
+          );
         })}
         <div ref={bottomRef} />
       </div>

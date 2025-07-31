@@ -4,7 +4,7 @@ import { useChessVsBot } from '@/contexts/GameBot';
 import { Chessboard } from 'react-chessboard';
 import { useEffect } from 'react';
 import PlayerCard from '../Player/Card';
-import GameOver from '../Game/GameOver';
+import GameStatus from '../Game/GameOver';
 import Controls from '../Controls/Controls';
 import { Chess, Color } from 'chess.js';
 import { useMatch } from '@/contexts/MatchContext';
@@ -30,7 +30,7 @@ export default function ChessMultiplayer() {
     gameOver,
     restart,
     time,
-    winner,
+    result,
     pause,
     resume,
     isPaused,
@@ -96,8 +96,8 @@ export default function ChessMultiplayer() {
 
     try {
       const initialTime = {
-        white: 900, // 5 min
-        black: 10
+        white: user?.match?.match_type?.time || 900, // 5 min
+        black: user?.match?.match_type?.time || 900
       };
       const { data: hasMatch, error } = await supabase
         // @ts-ignore
@@ -114,7 +114,7 @@ export default function ChessMultiplayer() {
           new Date(user?.match.created_at).getTime() / 1000
         ); // em segundos
         const elapsed = now - createdAt;
-        
+
         const whiteTimeLeft = Math.max(0, initialTime.white - elapsed);
         const blackTimeLeft = Math.max(0, initialTime.black);
         setHasStarted(true);
@@ -129,35 +129,42 @@ export default function ChessMultiplayer() {
       const newGame = new Chess(hasMatch[0].fen);
       setGame(newGame); // atualiza o estado do jogo
 
-
       // Garante que você tem jogadas salvas
       if (hasMatch.length > 0) {
         setHistory(hasMatch);
-        const lastToMove = hasMatch[0].player_id === user?.id ? user?.id : hasMatch[0].player_id;
+        const lastToMove =
+        // @ts-ignore
+          hasMatch[0].player_id === user?.id ? user?.id : hasMatch[0].player_id;
         const currentTurn =
           user?.match?.white_player_id == lastToMove ? 'black' : 'white';
-        
 
         const lastWhiteMove = hasMatch.find(
+          // @ts-ignore
           (m) => m.player_id === user.match.white_player_id
         );
 
         const lastBlackMove = hasMatch.find(
+          // @ts-ignore
           (m) => m.player_id === user.match.black_player_id
         );
 
+        // @ts-ignore
         let whiteTimeLeft = lastWhiteMove?.time_left;
+        // @ts-ignore
         let blackTimeLeft = lastBlackMove?.time_left;
-        
-        if(currentTurn == "white") {
+
+        if (currentTurn == 'white') {
+          // @ts-ignore
           whiteTimeLeft = hasMatch[0].time_left;
           blackTimeLeft = initialTime.black;
         } else {
-          if(lastBlackMove) {
+          if (lastBlackMove) {
+            // @ts-ignore
             blackTimeLeft = lastBlackMove.time_left;
           } else {
             const now = Math.floor(Date.now() / 1000); // em segundos
-             const base = Math.floor(
+            const base = Math.floor(
+              // @ts-ignore
               new Date(hasMatch[0].created_at).getTime() / 1000
             );
             const delta = now - base;
@@ -165,7 +172,6 @@ export default function ChessMultiplayer() {
             blackTimeLeft = initialTime.black - delta;
           }
         }
-
 
         setHasStarted(true);
         setTime({
@@ -179,7 +185,6 @@ export default function ChessMultiplayer() {
   };
 
   useEffect(() => {
-
     if (!user || !user.match || game) return;
     setPlayerColor(user.match?.white_player_id == user.id ? 'w' : 'b');
     setMatch(user.match);
@@ -193,7 +198,7 @@ export default function ChessMultiplayer() {
 
   if (!user || !user?.match) {
     return (
-      <div className="bg-[#13181b] rounded-lg p-4 max-h-full overflow-hidden w-full h-full">
+      <div className="bg-[#121c22] rounded-lg p-4 max-h-full overflow-hidden w-full h-full">
         <LoadingDots />
       </div>
     );
@@ -205,14 +210,18 @@ export default function ChessMultiplayer() {
       : user.match.black_player;
 
   return (
-    <div className="bg-[#13181b] rounded-lg p-4 max-h-full overflow-hidden w-auto h-full">
+    <div className="bg-[#121c22] rounded-lg p-4 max-h-full overflow-hidden w-auto h-full">
       <div className="flex flex-col items-center gap-4 h-full max-h-full">
         <div className="w-full flex items-start justify-between">
           <PlayerCard
-            time={time == null ? 0 : playerColor == 'w' ? time.black : time.white}
+            time={
+              time == null ? 0 : playerColor == 'w' ? time.black : time.white
+            }
             name={opponent?.username || 'Jhon jones'}
             trophies={opponent?.trophies}
+            isCheck={(!isPlayerTurn && game?.inCheck()) || false}
             isTurn={!isPlayerTurn ? 'Turn' : null}
+            image={opponent?.avatar_url}
           />
           <Controls
             stop={() => pause()}
@@ -222,11 +231,22 @@ export default function ChessMultiplayer() {
           />
         </div>
 
-        <div className="w-auto h-full aspect-square relative rounded-sm overflow-hidden bg-base-200 flex">
-          {winner == playerColor && <GameOver type="game_win" />}
-          {winner != playerColor && winner != null && <GameOver type="game_over" />}
-          {winner == null && gameOver && <GameOver type="game_pause" />}
-          {isPaused && <GameOver type="game_pause" />}
+        <div className="w-auto h-full aspect-square relative rounded-sm overflow-hidden bg-[#121c22] flex">
+          <GameStatus
+            stats={{
+              trophies: opponent?.trophies,
+              level: opponent?.level,
+              token: opponent?.token
+            }}
+            result={
+              result == null ? null :
+              result == 'drawn'
+                ? 'gameDrawn'
+                : result == playerColor
+                  ? 'gameWin'
+                  : 'gameLose'
+            }
+          />
           <Chessboard
             ref={chessboardRef}
             position={game?.fen()}
@@ -245,11 +265,15 @@ export default function ChessMultiplayer() {
 
         <div className="w-full flex items-end justify-end">
           <PlayerCard
-            time={time == null ? 0 : playerColor == 'w' ? time.white : time.black}
+            time={
+              time == null ? 0 : playerColor == 'w' ? time.white : time.black
+            }
             name={user?.username || 'Jhon jones'}
             trophies={user?.trophies}
             isTurn={isPlayerTurn ? 'Your Turn' : null}
+            isCheck={(isPlayerTurn && game?.inCheck()) || false}
             align="right"
+            image={opponent?.avatar_url}
           />
         </div>
       </div>

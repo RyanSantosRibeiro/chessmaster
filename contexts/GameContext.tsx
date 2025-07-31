@@ -133,12 +133,10 @@ function useMultiplayer() {
         // }
 
 
-        console.log({clone, square})
         // @ts-ignore
         const moves = clone.moves({ square, verbose: true });
         // @ts-ignore
         const hasPiece = game.get(square);
-        console.log({square, piece, moves,hasPiece})
           if (moves?.length > 0) {
             setSelectedSquare(square);
             // @ts-ignore

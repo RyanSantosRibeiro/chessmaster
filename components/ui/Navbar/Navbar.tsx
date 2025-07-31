@@ -15,7 +15,7 @@ export default async function Navbar() {
         Skip to content
       </a>
       <div className="w-full h-full p-2">
-        <Navlinks user={user} />
+        <Navlinks />
       </div>
     </nav>
   );

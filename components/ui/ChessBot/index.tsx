@@ -4,9 +4,10 @@ import { useChessVsBot } from '@/contexts/GameBot';
 import { Chessboard } from 'react-chessboard';
 import { useEffect, useMemo, useState } from 'react';
 import PlayerCard from '../Player/Card';
-import GameOver from '../Game/GameOver';
+import GameStatus from '../Game/GameOver';
 import Controls from '../Controls/Controls';
 import { Chess } from 'chess.js';
+import { useWallet } from '@/contexts/WalletContext';
 
 export default function ChessVsBot() {
   const {
@@ -30,6 +31,7 @@ export default function ChessVsBot() {
     setGame,
     chessboardRef
   } = useChessVsBot();
+  const { user } = useWallet()
 
   // function onDrop(sourceSquare, targetSquare, piece) {
   //   const move = {
@@ -66,10 +68,10 @@ export default function ChessVsBot() {
         />
       </div>
 
-      <div className="w-auto h-full aspect-square relative rounded-sm overflow-hidden bg-base-200 flex">
-        {winner && <GameOver type="game_win" />}
-        {gameOver && <GameOver type="game_over" />}
-        {isPaused && <GameOver type="game_pause" />}
+      <div className="w-auto h-full aspect-square relative rounded-sm overflow-hidden bg-[#121c22] flex">
+        {winner && <GameStatus result="gameWin" />}
+        {gameOver && <GameStatus result="gameOver" />}
+        {isPaused && <GameStatus result="gamePause" />}
 
         <Chessboard
           ref={chessboardRef}
@@ -88,12 +90,14 @@ export default function ChessVsBot() {
 
       <div className="w-full flex items-end justify-end">
         <PlayerCard
-          time={time.white}
-          name="You"
-          trophies={1200}
-          isTurn={isPlayerTurn ? 'Your turn' : null}
-          align="right"
-        />
+            time={time.white} 
+            name={user?.username || 'Jhon jones'}
+            trophies={user?.trophies}
+            isTurn={isPlayerTurn ? 'Your Turn' : null}
+            isCheck={(isPlayerTurn && game?.inCheck()) || false}
+            align="right"
+            image={user?.avatar_url}
+          />
       </div>
     </div>
   );

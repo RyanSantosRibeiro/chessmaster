@@ -18,8 +18,8 @@ export default function ComunityColumn({ matchCode }: Props) {
   const { user } = useAuth();
 
   return (
-    <div className="card bg-base-100 w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden lg:min-w-[350px] max-w-[400px]">
-      <div className="card-body flex-1 overflow-y-auto p-4 rounded-[10px_10px_0_0] bg-base-100 relative">
+    <div className="card bg-[#1b262c] w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden lg:min-w-[350px] max-w-[400px]">
+      <div className="card-body flex-1 overflow-y-auto p-4 rounded-[10px_10px_0_0] bg-[#1b262c] relative">
         <div className="relative flex overflow-hidden rounded-2xl shadow-xl group transition-transform duration-300 hover:scale-[1.02]">
           <img
             src={bg.src}
@@ -43,7 +43,7 @@ export default function ComunityColumn({ matchCode }: Props) {
           </div>
         </div>
 
-        <div className='relative w-full'>
+        <div className="relative w-full">
           <Scoreboard />
         </div>
       </div>

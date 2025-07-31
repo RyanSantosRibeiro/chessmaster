@@ -56,6 +56,7 @@ export const getUserDetails = cache(async (supabase: SupabaseClient) => {
 
 export const getUserByWallet = async (wallet: WalletData) => {
   try {
+      console.log({walletP: wallet})
       const response = await fetch(`/api/connect`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -104,9 +105,42 @@ export const getScoreboard = async () => {
     } 
 }
 
+export const getMatchTypes = async (type:string) => {
+  try {
+      const response = await fetch(`/api/match/types/${type}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+
+      return result.data;
+    } catch (error: any) {
+      return error;
+    } 
+}
+
 export const updateMatch = async (payload: any) => {
   try {
       const response = await fetch(`/api/match/result`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+
+      return result.data;
+    } catch (error: any) {
+      return error;
+    } 
+}
+
+export const saveWallet = async (payload: any) => {
+  try {
+      const response = await fetch(`/api/connect/save`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

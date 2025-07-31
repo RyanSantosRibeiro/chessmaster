@@ -5,7 +5,7 @@ import Button from '../Button';
 import LoadingDots from '../LoadingDots';
 import { useRouter } from 'next/navigation';
 import { useWallet } from '@/contexts/WalletContext';
-import { createMatch } from '@/utils/supabase/queries';
+import { createMatch, getMatch, getMatchTypes } from '@/utils/supabase/queries';
 
 const supabase = createClient();
 
@@ -15,23 +15,32 @@ const generateMatchId = () =>
 
 export function MatchmakingButtons() {
   const [inQueue, setInQueue] = useState(false);
+  const [matchTypes, setMatchTypes] = useState([]);
   const [channel, setChannel] = useState<any>(null);
-  const { user } = useWallet();
+  const { user, token } = useWallet();
   const router = useRouter();
 
-  useEffect(() => {
-    if (user?.match?.url_hash) {
-      // alert("Você já está em uma partida")
-      // router.push(`/play/${user?.match?.url_hash}`);
-    }
-  }, [user]);
+  const getMatch = async () => {
+    const response = await getMatchTypes('queue');
+    const result = await response;
+    console.log({ queue: result });
+    setMatchTypes(result);
+  };
 
-  const joinQueue = async (ticket: number) => {
+  useEffect(() => {
+    getMatch();
+  }, []);
+  useEffect(() => {
+   console.log({token})
+  }, [token]);
+
+  const joinQueue = async (type: number) => {
     if (!user) return;
     setInQueue(true);
     let hasMatched = false;
 
-    const matchmakingChannel = supabase.channel('matchmaking', {
+    // @ts-ignore
+    const matchmakingChannel = supabase.channel(`matchmaking-${type.ticket_amount}`, {
       config: {
         presence: { key: user.id }
       }
@@ -50,8 +59,6 @@ export function MatchmakingButtons() {
     matchmakingChannel
       .on('presence', { event: 'sync' }, async () => {
         const state = matchmakingChannel.presenceState();
-        console.log('presence Trigger!');
-        console.log({ state, hasMatched });
         if (hasMatched) return;
         const others = Object.entries(state)
           .filter(([id]) => id !== user.id)
@@ -61,12 +68,10 @@ export function MatchmakingButtons() {
         const match = others.find(
           (p) =>
             // @ts-ignore
-            Math.abs(p.trophies - user.trophies) <= 200 &&
-            // @ts-ignore
-            p.ticket_amount_cents === ticket
+            Math.abs(p.trophies - user.trophies) <= 200
         );
 
-        console.log({match})
+        console.log({ match });
 
         if (match) {
           console.log('Match!!');
@@ -74,35 +79,56 @@ export function MatchmakingButtons() {
           // @ts-ignore
           let isUserWhite = null;
 
-          if(user.trophies == match.trophies) {
-            isUserWhite = user.id < match.user_id
+          // @ts-ignore
+          if (user.trophies == match.trophies) {
+            // @ts-ignore
+            isUserWhite = user.id > match.user_id;
 
-            console.log({s:"São iguais",isUserWhite, u: user.id, m: match.user_id} )
+            console.log({
+              s: 'São iguais',
+              isUserWhite,
+              u: user.id,
+              // @ts-ignore
+              m: match.user_id
+            });
           } else {
-            isUserWhite = user.trophies < match.trophies
+            // @ts-ignore
+            isUserWhite = user.trophies < match.trophies;
           }
           // @ts-ignore
           const white_player_id = isUserWhite ? user.id : match.user_id;
           // @ts-ignore
           const black_player_id = isUserWhite ? match.user_id : user.id;
-          console.log({white_player_id, black_player_id})
-          const isResponsible = isUserWhite;
+          const isResponsible = white_player_id ==  user.id;
           const matchId = generateMatchId();
+          console.log('🟢 Responsavel ', isResponsible);
 
           if (isResponsible) {
             try {
               console.log('🟢🟢 Criando partida 🟢🟢');
-              // const payment = await transferToken() devtransfer Aqui transfere os tokens ou la no back com o createMatch em api/match/route.js
+              //  devtransfer Aqui transfere os tokens ou la no back com o createMatch em api/match/route.js
+              // user.odinData
+              // const payment = await transferToken(
+              //   user.odinData,
+              //   'htsfw-sunm3-lieuo-3gmbn-sogv4-ics5w-zz3ch-ubtpb-rfxxz-q2ufn-wqe',
+              //   '2k6r',
+              //   1458 // 0,000085 -> 8500000
+              // );
+
+              // if(!payment.success) throw payment;
 
               const reponse = await createMatch({
                 url_hash: matchId,
                 white_player_id,
                 black_player_id,
-                ticket_amount_cents: ticket
+                // @ts-ignore
+                match_type: type.id
               });
 
               console.log({ reponse });
               if (!reponse.success) return; // PM - Algum erro ao criar partida
+
+              localStorage.setItem('currentMatch', reponse.data[0]);
 
               await matchmakingChannel.send({
                 type: 'broadcast',
@@ -116,9 +142,9 @@ export function MatchmakingButtons() {
               });
 
               await cleanup();
-              console.log("Redirecionando")
+              console.log('Redirecionando');
 
-              // router.push(`/play/${matchId}`);
+              window.location.replace(`/play/${matchId}`);
             } catch (err) {
               console.error('Erro ao criar partida:', err);
               await cleanup();
@@ -136,8 +162,7 @@ export function MatchmakingButtons() {
           if (!players.includes(user.id)) return; // Ignora se não for pra You
           await cleanup();
           console.log('🟢🟢 broadcast - Partida encontrada 🟢🟢');
-          console.log("Redirecionando")
-          // router.push(`play/${matchId}`);
+          window.location.replace(`/play/${matchId}`);
         }
       )
       .on('presence', { event: 'join' }, ({ key, newPresences }) => {
@@ -151,8 +176,7 @@ export function MatchmakingButtons() {
           await matchmakingChannel.track({
             code: user.username,
             user_id: user.id,
-            trophies: user.trophies,
-            ticket_amount_cents: ticket
+            trophies: user.trophies
           });
         }
       });
@@ -169,28 +193,50 @@ export function MatchmakingButtons() {
     setInQueue(false);
   };
 
+  const bg = ['#2cb1c3', '#d65729', '#cc6d70'];
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex flex-col w-full">
       {!inQueue ? (
-        <div className="flex gap-2">
-          <button
-            onClick={() => joinQueue(1)}
-            className="btn relative transition-all duration-150 py-2 font-semibold rounded px-2 cursor-pointer"
-          >
-            Play $1
-          </button>
-          <button
-            onClick={() => joinQueue(5)}
-            className="btn relative transition-all duration-150 py-2 font-semibold rounded px-2 cursor-pointer"
-          >
-            Play $5
-          </button>
-          <button
-            onClick={() => joinQueue(10)}
-            className="btn relative transition-all duration-150 py-2 font-semibold rounded px-2 cursor-pointer"
-          >
-            Play $10
-          </button>
+        <div className="flex gap-2 w-full flex flex-col">
+          {matchTypes.length > 0 &&
+            matchTypes.map((type, index) => {
+              // @ts-ignore
+              const price = type?.ticket_amount * token?.priceDolar;
+
+              return (
+                <button
+                  key={index}
+                  onClick={() => joinQueue(type)}
+                  style={{ backgroundColor: bg[index] || '#89e0eb' }}
+                  className="btn btn-xl gap-0 group relative overflow-hidden transition-all duration-150 py-2 rounded px-2 cursor-pointer w-full flex flex-col items-start justify-between pearl"
+                >
+                  <p className="m-0 text-lg font-bold text-left">
+                    {/* @ts-ignore */}
+                    {type?.ticket_amount} Aurions
+                  </p>
+                  <p className="m-0 text-[10px] text-[#dbdbdb]">~= ${price.toFixed(2)} Usd</p>
+
+                  <span
+                    className="
+                    absolute 
+                    right-[-20%] 
+                    group-hover:right-[5%] 
+                    group-hover:opacity-40 
+                    transition-all 
+                    duration-300 
+                    text-5xl 
+                    font-bold 
+                    italic 
+                    opacity-10
+                  "
+                  >
+                    {/* @ts-ignore */}
+                    {type?.experience}
+                  </span>
+                </button>
+              );
+            })}
         </div>
       ) : (
         <div className="text-center">

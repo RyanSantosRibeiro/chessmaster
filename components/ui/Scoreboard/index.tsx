@@ -38,7 +38,7 @@ export default function Scoreboard() {
           <span className="cursor-default text-right">Trophies</span>
         </div>
 
-        {scoreboard?.map(
+        {scoreboard?.length > 0 && scoreboard?.map(
           (
             { username, trophies }: { username: string; trophies: number },
             index

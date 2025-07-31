@@ -1,76 +1,90 @@
 'use client';
 
-import { useChessVsBot } from "@/contexts/GameBot";
-import Button from "../Button";
+import Link from 'next/link';
 
 interface Props {
-    type: string;
+  result: string | null;
+  stats?: any;
 }
 
-export default function GameOver({ type }: Props) {
-    const { resume, restart } = useChessVsBot()
+export default function GameStatus({ result, stats }: Props) {
+  if (!result) return null;
 
-    const message: Record<string, { title: string, bg: string, class: string, button?: any , body?:any}> = {
-        game_over: {
-            class: "gameOver",
-            title: "You've been lost",
-            bg: "bg-base-100",
-            button: (
-                <button className="btn btn-sm  btn-warning flex items-center justify-center gap-2" onClick={()=>restart()}>
-                        <svg width="10px" height="10px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="#000000" d="M14.9547098,7.98576084 L15.0711,7.99552 C15.6179,8.07328 15.9981,8.57957 15.9204,9.12636 C15.6826,10.7983 14.9218,12.3522 13.747,13.5654 C12.5721,14.7785 11.0435,15.5888 9.37999,15.8801 C7.7165,16.1714 6.00349,15.9288 4.48631,15.187 C3.77335,14.8385 3.12082,14.3881 2.5472,13.8537 L1.70711,14.6938 C1.07714,15.3238 3.55271368e-15,14.8776 3.55271368e-15,13.9867 L3.55271368e-15,9.99998 L3.98673,9.99998 C4.87763,9.99998 5.3238,11.0771 4.69383,11.7071 L3.9626,12.4383 C4.38006,12.8181 4.85153,13.1394 5.36475,13.3903 C6.50264,13.9466 7.78739,14.1285 9.03501,13.9101 C10.2826,13.6916 11.4291,13.0839 12.3102,12.174 C13.1914,11.2641 13.762,10.0988 13.9403,8.84476 C14.0181,8.29798 14.5244,7.91776 15.0711,7.99552 L14.9547098,7.98576084 Z M11.5137,0.812976 C12.2279,1.16215 12.8814,1.61349 13.4558,2.14905 L14.2929,1.31193 C14.9229,0.681961 16,1.12813 16,2.01904 L16,6.00001 L12.019,6.00001 C11.1281,6.00001 10.6819,4.92287 11.3119,4.29291 L12.0404,3.56441 C11.6222,3.18346 11.1497,2.86125 10.6353,2.60973 C9.49736,2.05342 8.21261,1.87146 6.96499,2.08994 C5.71737,2.30841 4.57089,2.91611 3.68976,3.82599 C2.80862,4.73586 2.23802,5.90125 2.05969,7.15524 C1.98193,7.70202 1.47564,8.08224 0.928858,8.00448 C0.382075,7.92672 0.00185585,7.42043 0.0796146,6.87364 C0.31739,5.20166 1.07818,3.64782 2.25303,2.43465 C3.42788,1.22148 4.95652,0.411217 6.62001,0.119916 C8.2835,-0.171384 9.99651,0.0712178 11.5137,0.812976 Z"/>
-                        </svg>Retry
-                    </button>
-            )
-        },
-        game_win: {
-            class: "gameWin",
-            title: "Winner",
-            bg: "bg-base-100",
-            body: (
-                <div className="flex w-full gap-4 justify-center items-center mt-4 text-lg">
-                    <div>
-                        🔥 On Fire
-                    </div>
-                    <div>
-                        🏆 +15
-                    </div>
-                    <div>
-                        🪙 $ 20
-                    </div>
-                </div>
-            ),
-            button: (
-                <button className="btn btn-sm  btn-warning flex items-center justify-center gap-2" onClick={()=>restart()}>
-                    Continue
-                    </button>
-            )
-        },
-        game_pause: {
-            class: "gamePause",
-            title: "Pause",
-            bg: "bg-base-100",
-            button: (
-                <button className="btn btn-sm  btn-success flex items-center justify-center gap-2" onClick={()=>resume()}>
-                    Continue
-                </button>
-            )
-        },
-    };
-
+  if (result === 'gameWin') {
     return (
-        <div className={`absolute w-full h-full flex justify-center items-center z-30 ${message[type]?.class}`}>
-            <div className={`card border-base-300 w-full max-w-[300px] p-4 flex flex-col items-center justify-center ${message[type]?.bg || "bg-base-100"}`}>
-                <p className="card-title text-3xl text-center">
-                    {message[type]?.title || "Unknown State"}
-                </p>
-
-                {message[type]?.body}
-
-                <div className="flex gap-2 mt-3">
-                    {message[type]?.button}
-                </div>
+      <div className="fadeIn absolute w-full h-full flex justify-center items-center z-30 ">
+        <div className="card w-full max-w-[300px] p-6 text-white text-center shadow-lg border border-yellow-400 bg-gradient-to-br from-green-600 to-yellow-400">
+          <div className="text-5xl mb-2">🏆</div>
+          <h2 className="text-3xl font-bold mb-2">Victory!</h2>
+          <p className="text-lg mb-4">You dominated the arena</p>
+          {stats && (
+            <div className="flex flex-row justify-around mb-3">
+              <p className="text-sm">🏆 +{stats?.trophies || '-'}</p>
+              <p className="text-sm">🪙 +{stats?.token || '-'}</p>
+              <p className="text-sm">⚡️ +{stats?.level || '-'}</p>
             </div>
+          )}
+          <Link href="/play" className="btn btn-sm btn-warning">
+            {' '}
+            Play Again
+          </Link>
         </div>
+      </div>
     );
+  }
+
+  if (result === 'gameLose') {
+    return (
+      <div className="fadeIn absolute w-full h-full flex justify-center items-center z-30 border-none">
+        <div className="card w-full max-w-[300px] p-6 text-white text-center shadow-lg bg-[#1b1b1b]">
+          <div className="text-5xl mb-2">❌</div>
+          <h2 className="text-3xl font-bold mb-2">Defeat</h2>
+          <p className="text-lg mb-4">You’ve won this battle… rise stronger!</p>
+          <button
+            className="btn btn-sm btn-warning"
+            onClick={() => window.location.reload()}
+          >
+            Play again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (result === 'gameDrawn') {
+    return (
+      <div className="fadeIn absolute w-full h-full flex justify-center items-center z-30 border-none">
+        <div className="card w-full max-w-[300px] p-6 text-white text-center shadow-lg bg-[#1b1b1b]">
+          <h2 className="text-3xl font-bold mb-2">Stalemate</h2>
+          <p className="text-lg mb-4">
+            An even match. One more game could change everything.
+          </p>
+          <button
+            className="btn btn-sm btn-warning"
+            onClick={() => window.location.reload()}
+          >
+            Play again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="absolute w-full h-full flex justify-center items-center z-30 bg-[#1b1b1b]">
+      <div className="card border-base-300 w-full max-w-[300px] p-4 flex flex-col items-center justify-center">
+        <p className="card-title text-3xl text-center text-white">
+          {'Erro no servidor!'}
+        </p>
+        <div className="flex gap-2 mt-3">
+          <button
+            className="btn btn-sm btn-error"
+            onClick={() => window.location.reload()}
+          >
+            Recarregar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }

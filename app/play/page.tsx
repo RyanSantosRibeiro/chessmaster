@@ -23,8 +23,8 @@ export default function PlayPage() {
   }
 
   return (
-    <div className="flex gap-4 p-4 max-h-full w-full xl:px-20 h-full">
-      <div className="bg-[#13181b] rounded-lg p-4 max-h-full overflow-hidden w-auto h-full">
+    <div className="flex gap-4 p-4 max-h-full w-full xl:px-14 h-full">
+      <div className="bg-[#121c22] rounded-lg p-4 max-h-full overflow-hidden w-auto h-full">
         <ChessVsBot />
       </div>
       <DetailsColumn />

@@ -16,7 +16,7 @@ export default function Card({ title, description, footer, children }: Props) {
         {children}
       </div>
       {footer && (
-        <div className="p-4 border-t rounded-b-md border-zinc-700 bg-[#13181b] text-zinc-500">
+        <div className="p-4 border-t rounded-b-md border-zinc-700 bg-[#121c22] text-zinc-500">
           {footer}
         </div>
       )}

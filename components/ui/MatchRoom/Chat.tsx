@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWallet } from '@/contexts/WalletContext';
 
 type Props = {
   matchId: string;
@@ -11,13 +12,14 @@ type Props = {
 type Message = {
   sender: string;
   text: string;
+  timestamp: string;
 };
 
 export default function MatchRoomChat({ matchId }: Props) {
   const supabase = createClient();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const { user, loading } = useAuth();
+  const { user } = useWallet();
 
   useEffect(() => {
     const channel = supabase.channel(`match-${matchId}`, {
@@ -42,8 +44,9 @@ export default function MatchRoomChat({ matchId }: Props) {
   const sendMessage = async () => {
     if (!user) return;
     const message: Message = {
-      sender: user.email || 'You',
-      text: input
+      sender: user.username,
+      text: input,
+      timestamp: new Date().getHours() + ':' + new Date().getMinutes()
     };
 
     const channel = supabase
@@ -61,23 +64,20 @@ export default function MatchRoomChat({ matchId }: Props) {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <div className="w-full space-y-4 bg-base-100 rounded-lg p-4 overflow-y-auto h-fit">
+    <div className="w-full space-y-4 bg-[#1b262c] rounded-lg p-4 overflow-y-auto h-fit">
       <h2 className="text-lg font-semibold mb-2">Chat</h2>
-      <div className="h-40 overflow-y-auto bg-[#13181b] p-2 rounded mb-2">
+      <div className="h-40 overflow-y-auto bg-[#121c22] p-2 rounded mb-2">
         {messages.map((msg, i) => (
-          <div key={i}>
-            <strong>{msg.sender}:</strong> {msg.text}
+          <div key={i} style={{color: msg.sender==user?.username ? "#d65729" : "#89e0eb"}}>
+            <strong ><span className='text-xs'>{msg.timestamp}</span> {msg.sender}:</strong> {msg.text}
           </div>
         ))}
       </div>
       <div className="flex gap-2">
         <input
           value={input}
+          disabled={!user}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
@@ -86,11 +86,11 @@ export default function MatchRoomChat({ matchId }: Props) {
             }
           }}
           placeholder="Type a message"
-          className="flex-1 px-2 py-1 rounded text-sm bg-[#13181b] w-full"
+          className="flex-1 px-2 py-1 rounded text-sm bg-[#121c22] w-full"
         />
         <button
           onClick={sendMessage}
-          className="bg-[#13181b] text-white px-3 py-1 rounded flex items-center justify-center"
+          className="bg-[#121c22] text-white px-3 py-1 rounded flex items-center justify-center"
         >
           <svg
             width="20px"

@@ -15,7 +15,7 @@ export default function Modal({children, cta}:Props) {
   return (
     <div>
         {/* @ts-ignore */}
-        <button className={`w-full btn btn-${cta?.type}`} onClick={()=>document.getElementById('my_modal_2').showModal()}>{cta?.text || "open"}</button>
+        <button className={`w-full btn bg-[#2cb1c3] h-full`} onClick={()=>document.getElementById('my_modal_2').showModal()}>{cta?.text || "open"}</button>
         <dialog id="my_modal_2" className="modal">
         <div className="modal-box">
         {children}

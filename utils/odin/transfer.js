@@ -1,26 +1,21 @@
-export const odinFormat = (amount) => {
-  let [integerPart, decimalPart = ''] = amount.toString().split('.');
+import { odinFormat, validatePrincipalId } from '@/utils/odin/odinFormat';
+import { getActor } from '@/utils/actor';
 
-  if (!decimalPart) decimalPart = '00000000000';
-  else decimalPart = decimalPart.padEnd(11, '0').slice(0, 11);
-  
-  return `${integerPart}.${decimalPart}`;
-};
-
-
-export const transferToken = async (to, tokenId, amount) => {
+export const transferToken = async (odinData, to, tokenId, amount) => {
   try {
     if (!validatePrincipalId(to)) {
-      throw new Error('Invalid Principal ID format. Use the format: xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxx');
+      throw new Error(
+        'Invalid Principal ID format. Use the format: xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxx'
+      );
     }
 
-    const actor = await getActor();
-    
+    const actor = await getActor(odinData);
+
     const formattedAmount = odinFormat(amount);
-    
+
     const amountWithoutDecimal = formattedAmount.replace('.', '');
     const amountBigInt = BigInt(amountWithoutDecimal);
-    
+
     const result = await actor.token_transfer({
       to: to,
       tokenid: tokenId,
@@ -38,14 +33,13 @@ export const transferToken = async (to, tokenId, amount) => {
         throw new Error(result.err || 'Error during transfer');
       }
     }
-    
+
     return {
       success: true,
       message: 'Transfer successful'
     };
-    
   } catch (error) {
-    console.error("Error during transfer:", error);
+    console.error('Error during transfer:', error);
     throw error;
   }
 };

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 interface UnisatConnectProps {
-  onAddressChange?: (address: string, signature?: string) => void;
+  onAddressChange?: (address: string, signature?: string, odinData?: any) => void;
   onClose?: () => void;
 }
 
@@ -60,16 +60,48 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
         throw new Error('0 account found');
       }
 
-      const message = `Connect to Aurion! \n\nAddress: ${address}}`;
-      
-      const signature = await provider.signMessage(message);
+      const publicKey = await provider.getPublicKey()
+
+      // const message = `Connect to Aurion! \n\nAddress: ${address}}`;
+      //fetch prepare_login
+      // 
+
+      const response = await fetch(`/api/connect/prepare`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          address
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+
+
+      // @ts-ignore
+      const signature = await provider.signMessage(result.message);
 
       if (!signature) {
         throw new Error('sign fail');
       }
 
+      const payload = {
+        address,
+        signature,
+        publicKey,
+        walletType: 'unisat'
+      }
+
+      const responseLogin = await fetch(`/api/connect/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const responseLoginA = await responseLogin.json()
       if (onAddressChange) {
-        onAddressChange(address, signature);
+        // @ts-ignore
+        onAddressChange(address, signature, responseLoginA.data);
       }
 
       if (onClose) {

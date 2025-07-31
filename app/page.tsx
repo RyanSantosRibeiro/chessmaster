@@ -8,6 +8,7 @@ import {
 import { AuthProvider } from '@/contexts/AuthContext';
 import Navbar from '@/components/ui/Navbar';
 import bg from './bg.png';
+import Link from 'next/link';
 
 export default async function PricingPage() {
   const supabase = createClient();
@@ -67,9 +68,9 @@ export default async function PricingPage() {
                 viewBox="0 0 24 24"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
                 />
               </svg>
@@ -81,16 +82,14 @@ export default async function PricingPage() {
 
       <section className="relative flex items-center justify-center overflow-hidden hero-bg w-full">
         <div className="relative group mx-auto w-full">
-            <img
-              src={bg.src}
-              alt="Fair and Secure Gaming"
-              className="relative w-full max-h-[400px] object-cover"
-              width={1920}
-              height={1080}
-            />
-            <div className='absolute inset-0 z-10 bg-gradient-to-b from-transparent to-[#0f1315] pointer-events-none'>
-
-            </div>
+          <img
+            src={bg.src}
+            alt="Fair and Secure Gaming"
+            className="relative w-full max-h-[400px] object-cover"
+            width={1920}
+            height={1080}
+          />
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-[#0e171e] pointer-events-none"></div>
         </div>
       </section>
       <section className="relative flex items-center justify-center overflow-hidden hero-bg">
@@ -135,7 +134,7 @@ export default async function PricingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-              <button className="gradient-hero text-white font-bold px-12 py-4 rounded-lg text-lg hover:scale-105 transition-all duration-300 epic-shadow">
+              <a href="https://odin.fun/token/2k6r" className="gradient-hero text-white font-bold px-12 py-4 rounded-lg text-lg hover:scale-105 transition-all duration-300 epic-shadow">
                 <svg
                   className="w-5 h-5 inline mr-2"
                   fill="none"
@@ -143,15 +142,15 @@ export default async function PricingPage() {
                   viewBox="0 0 24 24"
                 >
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="M13 10V3L4 14h7v7l9-11h-7z"
                   />
                 </svg>
-                ENTER THE ARENA
-              </button>
-              <button className="bg-accent text-white px-12 py-4 rounded-lg text-lg hover:bg-accent/90 transition-all duration-300 hover:glow-effect">
+                Buy Aurion
+              </a>
+              <Link href="/play" className="bg-accent text-white px-12 py-4 rounded-lg text-lg hover:bg-accent/90 transition-all duration-300 hover:glow-effect">
                 <svg
                   className="w-5 h-5 inline mr-2"
                   fill="none"
@@ -159,14 +158,14 @@ export default async function PricingPage() {
                   viewBox="0 0 24 24"
                 >
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                   />
                 </svg>
-                CONNECT WALLET
-              </button>
+                Play Game
+              </Link>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12">
@@ -174,17 +173,17 @@ export default async function PricingPage() {
                 <div className="text-3xl font-bold text-primary mb-2">
                   5 MIN
                 </div>
-                <div className="text-sm text-muted">Blitz Battles</div>
+                <div className="text-sm text-muted">Chess Battles</div>
               </div>
               <div className="bg-card/50 backdrop-blur-sm border border-accent/20 p-6 rounded-lg hover:glow-effect transition-all duration-300">
                 <div className="text-3xl font-bold text-accent mb-2">
                   REAL BTC
                 </div>
-                <div className="text-sm text-muted">Aurion Rewards</div>
+                <div className="text-sm text-muted">Aurion Token</div>
               </div>
               <div className="bg-card/50 backdrop-blur-sm border border-info/20 p-6 rounded-lg hover:glow-effect transition-all duration-300">
                 <div className="text-3xl font-bold text-info mb-2">24/7</div>
-                <div className="text-sm text-muted">Arena Open</div>
+                <div className="text-sm text-muted">Games On</div>
               </div>
             </div>
           </div>
@@ -223,9 +222,9 @@ export default async function PricingPage() {
                   viewBox="0 0 24 24"
                 >
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
                   />
                 </svg>
@@ -253,9 +252,9 @@ export default async function PricingPage() {
                   viewBox="0 0 24 24"
                 >
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
                   />
                 </svg>
@@ -283,9 +282,9 @@ export default async function PricingPage() {
                   viewBox="0 0 24 24"
                 >
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
                   />
                 </svg>
@@ -355,9 +354,9 @@ export default async function PricingPage() {
                     viewBox="0 0 24 24"
                   >
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
                       d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
                     />
                   </svg>
@@ -383,9 +382,9 @@ export default async function PricingPage() {
                     viewBox="0 0 24 24"
                   >
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
                       d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                     />
                   </svg>
@@ -411,9 +410,9 @@ export default async function PricingPage() {
                     viewBox="0 0 24 24"
                   >
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
                       d="M13 10V3L4 14h7v7l9-11h-7z"
                     />
                   </svg>

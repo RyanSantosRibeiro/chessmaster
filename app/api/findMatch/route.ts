@@ -96,8 +96,6 @@ export const POST = async (req: Request) => {
       playerB: opponent
     };
 
-    // Aqui You pode salvar a partida no Supabase ou emitir evento Realtime
-    console.log('Match found:', match);
     return NextResponse.json({ matchFound: true, match });
   } else {
     queue.push(newPlayer);

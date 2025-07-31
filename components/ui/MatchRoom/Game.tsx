@@ -58,6 +58,7 @@ export default function GameRoom() {
 
       setMatchId(match.id);
       const color = match.white_player_id === user.id ? 'white' : 'black';
+      // @ts-ignore
       setPlayerColor(color);
 
       const newGame = new Chess();
@@ -159,12 +160,13 @@ export default function GameRoom() {
   };
 
   return (
-    <div className="col-span-6 bg-[#13181b] rounded-lg p-4">
+    <div className="col-span-6 bg-[#121c22] rounded-lg p-4">
       <div className="aspect-square bg-zinc-800 rounded-lg overflow-hidden relative">
         {playerColor && (
           <Chessboard
             // @ts-ignore
             position={game.fen()}
+            // @ts-ignore
             boardOrientation={playerColor}
             onPieceDrop={makeMove}
             arePiecesDraggable={isMyTurn}

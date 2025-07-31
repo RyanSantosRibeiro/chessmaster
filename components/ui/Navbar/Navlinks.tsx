@@ -22,7 +22,7 @@ interface NavlinksProps {
 export default function Navlinks({ user }: NavlinksProps) {
   const router = getRedirectMethod() === 'client' ? useRouter() : null;
   const { profile } = useAuth();
-  const { walletData, disconnectWallet } = useWallet();
+  const { walletData, disconnectWallet, user: userOdin } = useWallet();
   const [showDisconnectMenu, setShowDisconnectMenu] = useState(false);
 
   const handleWalletClick = () => {
@@ -51,27 +51,30 @@ export default function Navlinks({ user }: NavlinksProps) {
           <Logo />
         </Link>
         <nav className="w-full flex flex-col gap-2">
-          <Link href="/play" className="transition-all duration-150 py-2 font-semibold rounded px-2">
+          <Link href="/play" className="transition-all duration-150 py-1 font-semibold rounded px-2 text-md hover:bg-[#182127]">
             ▶️ Play
           </Link>
-          <Link href="/play" className="transition-all duration-150 py-2 font-semibold rounded px-2">
-            🚀 Scoreboard
-          </Link>
-          <p className="linkDisable relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default">
-            🏆 Tournaments
+          <p className="linkDisable relative transition-all duration-150 py-1 font-semibold rounded px-2 opacity-30 cursor-default text-md">
+            🏛 Coliseum
           </p>
-          <p className="linkDisable relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default">
+          <p className="linkDisable relative transition-all duration-150 py-1 font-semibold rounded px-2 opacity-30 cursor-default text-md">
+            📜 Missions
+          </p>
+          <p className="linkDisable relative transition-all duration-150 py-1 font-semibold rounded px-2 opacity-30 cursor-default text-md">
             🌎 Friends
           </p>
+          <p className="linkDisable relative transition-all duration-150 py-1 font-semibold rounded px-2 opacity-30 cursor-default text-md">
+            👑 Tournment of Lords
+          </p>
           {user && (
-            <Link href="/account" className="transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-default">
+            <Link href="/account" className="transition-all duration-150 py-1 font-semibold rounded px-2 opacity-30 cursor-default text-md">
               👤 Account
             </Link>
           )}
         </nav>
       </div>
       <div className="flex flex-col justify-end gap-2"> 
-        {user ? (
+        {/* {user ? (
           <>
             <Modal cta={{text: `${profile?.cash || ""} Aurion`,type: "primary"}}>
                 <WalletInterface/>
@@ -86,16 +89,13 @@ export default function Navlinks({ user }: NavlinksProps) {
         ) : (
           <div className="flex flex-col gap-2 my-4">
             <ConnectXverse />
-            {/* <Link href="/signin" className={s.button_secondary}>
-              Register
-            </Link> */}
             {walletData ? (
               <div className="relative">
                 <button
                   onClick={handleWalletClick}
                   className="w-full btn btn-primary text-xs font-mono rounded-lg p-4 overflow-hidden inset-0 bg-gradient-to-r from-primary/10 to-secondary/10"
                 >
-                  {walletData.address.slice(0, 6)}...{walletData.address.slice(-4)} 
+                  {userOdin ? userOdin.username : "..."} 
                 </button>
                 {showDisconnectMenu && (
                   <div className="absolute bottom-full left-0 right-0 mb-2 bg-gray-800 border border-gray-700 rounded-lg p-2 z-50">
@@ -114,7 +114,7 @@ export default function Navlinks({ user }: NavlinksProps) {
               </Modal>
             )}
           </div>
-        )}
+        )} */}
       </div>
 
       <div className='flex flex-col gap-2 mt-auto pt-2'>

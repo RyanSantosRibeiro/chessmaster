@@ -53,16 +53,14 @@ const idlFactory = ({ IDL }) => {
 
 let actorInstance = null;
 
-const createIdentity = async () => {
+const createIdentity = async (odinData) => {
     try {
-        const polarIdentity = JSON.parse(localStorage.getItem('polarIdentity'));
-        
-        if (!polarIdentity || !polarIdentity.sessionIdentity) {
+        if (!odinData.delegationChain || !odinData.sessionIdentity) {
             throw new Error('Identity data not found in localStorage');
         }
 
-        const publicKeyHex = polarIdentity.sessionIdentity[0].slice(-64);
-        const privateKeyHex = polarIdentity.isXverse ? polarIdentity.sessionIdentity[1] + publicKeyHex : polarIdentity.sessionIdentity[0];
+        const publicKeyHex = odinData.sessionIdentity[0].slice(-64);
+        const privateKeyHex = odinData.sessionIdentity[0];
 
         const privateKeyBytes = Buffer.from(privateKeyHex, "hex");
         const publicKeyBytes = Buffer.from(publicKeyHex, "hex");
@@ -70,14 +68,14 @@ const createIdentity = async () => {
         const sessionIdentity = Ed25519KeyIdentity.fromKeyPair(publicKeyBytes, privateKeyBytes);
 
         const restructuredDelegationChain = {
-            delegations: polarIdentity.delegationChain.delegations.map(del => ({
+            delegations: odinData.delegationChain.delegations.map(del => ({
                 delegation: {
                     expiration: del.delegation.expiration,
                     pubkey: del.delegation.pubkey,
                 },
                 signature: del.signature
             })),
-            publicKey: polarIdentity.delegationChain.publicKey
+            publicKey: odinData.delegationChain.publicKey
         };
         
         const delegationChain = DelegationChain.fromJSON(JSON.stringify(restructuredDelegationChain));
@@ -89,14 +87,9 @@ const createIdentity = async () => {
     }
 };
 
-export const createActor = async () => {
+export const createActor = async (odinData) => {
     try {
-        const actorData = JSON.parse(localStorage.getItem('actorData'));
-        if (!actorData) {
-            throw new Error('Actor data not found in localStorage');
-        }
-
-        const identity = await createIdentity();
+        const identity = await createIdentity(odinData);
 
         const agent = new HttpAgent({
             host: 'https://icp0.io',
@@ -117,9 +110,9 @@ export const createActor = async () => {
     }
 };
 
-export const getActor = async () => {
+export const getActor = async (odinData) => {
     if (!actorInstance) {
-        return await createActor();
+        return await createActor(odinData);
     }
     return actorInstance;
 };

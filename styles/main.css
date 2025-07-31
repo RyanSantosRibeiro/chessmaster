@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "daisyui";
 @tailwind base;
 @tailwind components;
@@ -23,13 +23,11 @@
   background-color: rgba(34, 197, 94, 0.13);
 }
 
-
 *,
 *:before,
 *:after {
   box-sizing: inherit;
 }
-
 
 html {
   height: 100%;
@@ -82,11 +80,11 @@ p a {
 }
 
 .bg-nivel-2 {
-  background-color: #13181b;
+  background-color: #121c22;
 }
 
 .bg-nivel-3 {
-  background-color: #0f1315;
+  background-color: #0e171e;
 }
 
 .gameOver {
@@ -134,7 +132,9 @@ p a {
     opacity: 0;
   }
   100% {
-    box-shadow: 0 0 40px rgba(255, 215, 0, 0.9), 0 0 100px #ff0;
+    box-shadow:
+      0 0 40px rgba(255, 215, 0, 0.9),
+      0 0 100px #ff0;
     transform: scale(1);
     opacity: 1;
   }
@@ -148,7 +148,7 @@ p a {
 }
 
 .winnerEffect::before {
-  content: "";
+  content: '';
   position: absolute;
   width: 200%;
   height: 200%;
@@ -162,8 +162,12 @@ p a {
 }
 
 @keyframes spinConfetti {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* .gameWin .card-title  {
@@ -178,13 +182,16 @@ p a {
 
 @keyframes pulseGlow {
   from {
-    text-shadow: 0 0 10px #fff000, 0 0 20px #ff9900;
+    text-shadow:
+      0 0 10px #fff000,
+      0 0 20px #ff9900;
   }
   to {
-    text-shadow: 0 0 20px #fff000, 0 0 40px #ff9900;
+    text-shadow:
+      0 0 20px #fff000,
+      0 0 40px #ff9900;
   }
 }
-
 
 .modal-backdrop {
   backdrop-filter: blur(2px);
@@ -198,10 +205,40 @@ p a {
   border-radius: 8px;
   background-color: #00aad3;
   color: white;
-  content: "Soon";    
+  content: 'Soon';
   font-size: 11px;
   position: absolute;
   top: 0;
   right: 0;
-  scale: .7;
+  scale: 0.7;
+}
+
+
+.ascend-bar-container {
+  position: relative;
+  width: 100%;
+  border-radius: 9999px;
+  overflow: hidden; 
+    background-color: #111827; /* fundo escuro para destacar */
+}
+
+.ascend-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #00ffe0, #ff00d4, #00ffe0);
+  background-size: 200% 100%; 
+  animation: ascendFlow 2s linear infinite;
+  border-radius: 9999px;
+}
+
+@keyframes ascendFlow {
+  0% {
+    background-position: 200% 0%;
+  }
+  100% {
+    background-position: -200% 0%;
+  }
 }

@@ -7,11 +7,11 @@ import UnisatConnect from './WalletsProviders/Unisat';
 
 export default function WalletConnect() {
   const { profile } = useAuth();
-  const { walletData, setWalletData } = useWallet();
+  const { walletData, setWalletData, user } = useWallet();
   const [error, setError] = useState<string | null>(null);
 
-  const handleAddressChange = (newAddress: string, signature?: string) => {
-    setWalletData({ address: newAddress, signature });
+  const handleAddressChange = (newAddress: string, signature?: string, odinData?: any) => {
+    setWalletData({ address: newAddress, signature, odinData });
     setError(null);
   };
 
@@ -19,7 +19,7 @@ export default function WalletConnect() {
     <div className="p-6 max-w-md mx-auto bg-gray-900 rounded-lg">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-white">
-          Connect Wallet
+          Connect Wallet 2
         </h2>
       </div>
 
@@ -35,7 +35,7 @@ export default function WalletConnect() {
             <div>
               <p className="font-medium">Connected Wallet</p>
               <p className="text-sm text-green-300 font-mono">
-                {walletData.address.slice(0, 6)}...{walletData.address.slice(-4)}
+                {user?.username}
               </p>
               {walletData.signature && (
                 <p className="text-xs text-green-400 mt-1">

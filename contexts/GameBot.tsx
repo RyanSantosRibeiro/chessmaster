@@ -75,7 +75,6 @@ function useChessVsBotProvider() {
 
   // Timer
   useEffect(() => {
-    console.log("Tickando timer")
     if (isPaused || game.isGameOver() || winner || !firstMove) return;
     timerRef.current = setInterval(() => {
       setTime((prev) => {
@@ -129,16 +128,13 @@ function useChessVsBotProvider() {
         // Atualizando posição
         // const getPiece = clone.findPiece(pieceToGet)
         // const pieceToPut = clone.remove(square);
-        // console.log({pieceToPut})
         // if(pieceToPut ) {
         //   clone.put(pieceToPut, square);
         // }
 
 
-        console.log({clone, square})
         const moves = clone.moves({ square, verbose: true });
         const hasPiece = game.get(square);
-        console.log({square, piece, moves,hasPiece})
           if (moves?.length > 0) {
             setSelectedSquare(square);
             setPossibleMoves(moves.map((m) => m.to));
@@ -176,7 +172,6 @@ function useChessVsBotProvider() {
   const makeMove = (sourceSquare:any , targetSquare: any) => {
     if (isPaused || game.isGameOver() || winner) return false;
     if (!firstMove) setFirstMove(true);
-    console.log("Realizando movimento!")
     const move = {
       from: sourceSquare,
       to: targetSquare,
@@ -188,7 +183,6 @@ function useChessVsBotProvider() {
       if (result === null) return false; // movimento ilegal
       const newGame = new Chess(game.fen())
       const hist = game.history()
-      console.log({hist, history})
       // setHistory(history=>[...history, hist[0]])
 
       setGame(game); // atualiza o estado do jogo
