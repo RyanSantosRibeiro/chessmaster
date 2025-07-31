@@ -223,12 +223,12 @@ export default function ChessMultiplayer() {
             isTurn={!isPlayerTurn ? 'Turn' : null}
             image={opponent?.avatar_url}
           />
-          <Controls
+          {/* <Controls
             stop={() => pause()}
             resume={() => resume()}
             restart={() => restart()}
             isPaused={isPaused}
-          />
+          /> */}
         </div>
 
         <div className="w-auto h-full aspect-square relative rounded-sm overflow-hidden bg-[#121c22] flex">
