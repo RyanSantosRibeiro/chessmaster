@@ -75,18 +75,18 @@ export const POST = async (req: Request) => {
     })
     .eq('id', loser.id);
 
-  // const odinPlataform = await JSON.parse(process.env.ODIN_PLATAFORM as string)
+  const odinPlataform = await JSON.parse(process.env.ODIN_PLATAFORM as string)
   // console.log({odinPlataform})
-  // const reward = (verifyMatch.ticket_amount * 2) * 0.8;
+  const reward = (verifyMatch.ticket_amount * 2) * 0.8;
 
-  // const payment = await transferToken(
-  //   odinPlataform,
-  //   winner.odinData.userPrincipal,
-  //   '2k6r',
-  //   reward // 0,000085 -> 8500000
-  // );
+  const payment = await transferToken(
+    odinPlataform,
+    winner.odinData.userPrincipal,
+    '2k6r',
+    reward // 0,000085 -> 8500000
+  );
 
-  // if (!payment.success) throw payment;
+  if (!payment.success) throw payment;
 
   if (winnerPlayerError || loserPlayerError) {
     return new Response(

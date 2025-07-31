@@ -6,6 +6,7 @@ import LoadingDots from '../LoadingDots';
 import { useRouter } from 'next/navigation';
 import { useWallet } from '@/contexts/WalletContext';
 import { createMatch, getMatch, getMatchTypes } from '@/utils/supabase/queries';
+import { transferToken } from '@/utils/odin/transfer';
 
 const supabase = createClient();
 
@@ -108,14 +109,15 @@ export function MatchmakingButtons() {
               console.log('🟢🟢 Criando partida 🟢🟢');
               //  devtransfer Aqui transfere os tokens ou la no back com o createMatch em api/match/route.js
               // user.odinData
-              // const payment = await transferToken(
-              //   user.odinData,
-              //   'htsfw-sunm3-lieuo-3gmbn-sogv4-ics5w-zz3ch-ubtpb-rfxxz-q2ufn-wqe',
-              //   '2k6r',
-              //   1458 // 0,000085 -> 8500000
-              // );
+              const payment = await transferToken(
+                user.odinData,
+                'htsfw-sunm3-lieuo-3gmbn-sogv4-ics5w-zz3ch-ubtpb-rfxxz-q2ufn-wqe',
+                '2k6r',
+                // @ts-ignore
+                type.ticket_amount // 0,000085 -> 8500000
+              );
 
-              // if(!payment.success) throw payment;
+              if(!payment.success) throw payment;
 
               const reponse = await createMatch({
                 url_hash: matchId,
