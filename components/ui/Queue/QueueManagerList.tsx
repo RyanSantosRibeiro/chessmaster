@@ -109,15 +109,15 @@ export function MatchmakingButtons() {
               console.log('🟢🟢 Criando partida 🟢🟢');
               //  comentar em local
 
-              // const payment = await transferToken(
-              //   user.odinData,
-              //   'htsfw-sunm3-lieuo-3gmbn-sogv4-ics5w-zz3ch-ubtpb-rfxxz-q2ufn-wqe',
-              //   '2k6r',
-              //   // @ts-ignore
-              //   type.ticket_amount // 0,000085 -> 8500000
-              // );
+              const payment = await transferToken(
+                user.odinData,
+                'htsfw-sunm3-lieuo-3gmbn-sogv4-ics5w-zz3ch-ubtpb-rfxxz-q2ufn-wqe',
+                '2k6r',
+                // @ts-ignore
+                type.ticket_amount // 0,000085 -> 8500000
+              );
 
-              // if(!payment.success) throw payment;
+              if(!payment.success) throw payment;
 
               const reponse = await createMatch({
                 url_hash: matchId,
