@@ -118,8 +118,7 @@ export default function Navlinks({ user }: NavlinksProps) {
       </div>
 
       <div className='flex flex-col gap-2 mt-auto pt-2'>
-        <a href='/' className='text-gray-700'>Suport</a>
-        <a href='/' className='text-gray-700'>About Us</a>
+        <a href='/ticket' className='text-gray-700'>Suport</a>
         <p className="text-gray-700 text-xs">© 2025 Aurion Runes Platform</p>
       </div>
     </div>

@@ -45,12 +45,6 @@ export default function DetailsColumn({ defaultTab }: Props) {
     defaultTab ? defaultTab : 'newMatch'
   );
 
-  if (!user)
-    return (
-      <div className="card bg-[#1b262c] w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden lg:min-w-[350px] max-w-[400px] overflow-hidden">
-        <LoadingDots />
-      </div>
-    );
 
   return (
     <div className="card bg-[#1b262c] w-full flex-1 h-full rounded-lg shadow-lg flex flex-col overflow-hidden lg:min-w-[350px] max-w-[400px]">
@@ -133,19 +127,6 @@ export default function DetailsColumn({ defaultTab }: Props) {
                   <p className="text-md font-bold mb-2">
                     Connect your wallet. The warriors are coming.
                   </p>
-                  <div className="flex flex-row gap-2">
-                    <div className="flex gap-2">
-                      <button className="btn relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-pointer">
-                        0.00001 Aurion
-                      </button>
-                      <button className="btn relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-pointer">
-                        0.00005 Aurion
-                      </button>
-                      <button className="btn relative transition-all duration-150 py-2 font-semibold rounded px-2 opacity-30 cursor-pointer">
-                        0.00010 Aurion
-                      </button>
-                    </div>
-                  </div>
                 </div>
               )}
             </div>
