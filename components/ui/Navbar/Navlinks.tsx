@@ -43,8 +43,8 @@ export default function Navlinks({ user }: NavlinksProps) {
           <span className="text-2xl font-bold gradient-text font-display text-white">
                 AURION
               </span>
-              <span className="hidden sm:inline-flex bg-accent/20 text-accent text-xs px-2 py-1 rounded border border-accent/30">
-                Alpha
+              <span className="hidden sm:inline-flex bg-accent/20 text-accent text-xs px-2 py-1 rounded border border-accent/30 whitespace-pre-line">
+                Test Alpha
               </span>
         </p>
         <Link href="/" className={s.logo} aria-label="Logo">
