@@ -8,6 +8,7 @@ import { useWallet } from '@/contexts/WalletContext';
 import { createMatch, getMatch, getMatchTypes } from '@/utils/supabase/queries';
 import { transferToken } from '@/utils/odin/transfer';
 
+
 const supabase = createClient();
 
 const generateMatchId = () =>
@@ -18,8 +19,9 @@ export function MatchmakingButtons() {
   const [inQueue, setInQueue] = useState(false);
   const [matchTypes, setMatchTypes] = useState([]);
   const [channel, setChannel] = useState<any>(null);
-  const { user, token } = useWallet();
+  const { user, token, balance } = useWallet();
   const router = useRouter();
+
 
   const getMatch = async () => {
     const response = await getMatchTypes('queue');
@@ -37,6 +39,9 @@ export function MatchmakingButtons() {
 
   const joinQueue = async (type: number) => {
     if (!user) return;
+
+    // @ts-ignore
+    if(balance <= type.ticket_amount) return;
     setInQueue(true);
     let hasMatched = false;
 
@@ -111,7 +116,7 @@ export function MatchmakingButtons() {
 
               const payment = await transferToken(
                 user.odinData,
-                'htsfw-sunm3-lieuo-3gmbn-sogv4-ics5w-zz3ch-ubtpb-rfxxz-q2ufn-wqe',
+                "4rqr4-35yv3-j74z2-3hqq3-wfpmo-xnbfl-xipye-zbfqy-w2bxi-h77pv-sae",
                 '2k6r',
                 // @ts-ignore
                 type.ticket_amount // 0,000085 -> 8500000
@@ -162,6 +167,16 @@ export function MatchmakingButtons() {
           console.log('Recebeu broadcast de match:', matchId, players);
 
           if (!players.includes(user.id)) return; // Ignora se não for pra You
+
+          const payment = await transferToken(
+                user.odinData,
+                "4rqr4-35yv3-j74z2-3hqq3-wfpmo-xnbfl-xipye-zbfqy-w2bxi-h77pv-sae",
+                '2k6r',
+                // @ts-ignore
+                type.ticket_amount // 0,000085 -> 8500000
+              );
+
+              if(!payment.success) throw payment;
           await cleanup();
           console.log('🟢🟢 broadcast - Partida encontrada 🟢🟢');
           window.location.replace(`/play/${matchId}`);
