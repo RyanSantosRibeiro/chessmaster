@@ -311,7 +311,7 @@ export default async function PricingPage() {
               WHY CHOOSE AURION
             </div>
             <h2 className="text-4xl md:text-6xl font-bold mb-6 gradient-text font-display">
-              The Viking Way
+              The Aurion Runer
             </h2>
             <p className="text-xl text-muted max-w-3xl mx-auto">
               Join the ranks of chess warriors who have chosen the path of
@@ -390,7 +390,7 @@ export default async function PricingPage() {
                   </svg>
                 </div>
                 <h3 className="text-2xl font-bold mb-4 text-foreground">
-                  Nordic Design and Lore
+                  Design and Lore
                 </h3>
                 <p className="text-muted leading-relaxed">
                   Every match is legend. Immerse yourself in the epic saga of
