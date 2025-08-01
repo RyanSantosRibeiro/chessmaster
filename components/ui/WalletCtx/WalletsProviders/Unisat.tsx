@@ -108,6 +108,9 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
         onClose();
       }
 
+      window.location.reload();
+
+
     } catch (err: any) {
       console.error('erro:', err);
       setError(err.message || 'Failed to connect to Unisat wallet');
