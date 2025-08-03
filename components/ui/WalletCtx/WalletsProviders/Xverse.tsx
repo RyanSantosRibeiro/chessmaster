@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-interface UnisatConnectProps {
+interface XverseConnectProps {
   onAddressChange?: (
     address: string,
     signature?: string,
@@ -16,9 +16,9 @@ export const checkWalletConnection = async (): Promise<{
   isConnected: boolean;
 }> => {
   try {
-    if ('unisat' in window) {
+    if ('xverse' in window) {
       const anyWindow = window as any;
-      const provider = anyWindow.unisat;
+      const provider = anyWindow.xverse;
 
       if (provider) {
         const accounts = await provider.getAccounts();
@@ -32,21 +32,21 @@ export const checkWalletConnection = async (): Promise<{
   }
 };
 
-const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
+const XverseConnect = ({ onAddressChange, onClose }: XverseConnectProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const getUnisatProvider = () => {
-    if ('unisat' in window) {
-      const anyWindow = window as any;
-      const provider = anyWindow.unisat;
+  const getXverseProvider = () => {
+    if ('xverse' in window) {
+      const anyWindow = window;
+      const provider = anyWindow.xverse?.bitcoin;
 
-      if (provider) {
+      if (provider && provider.isXverse) {
         return provider;
       }
     }
 
-    window.open('https://unisat.io/', '_blank');
+    window.open('https://xverse.app/', '_blank');
     return null;
   };
 
@@ -55,9 +55,9 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
       setIsLoading(true);
       setError('');
 
-      const provider = getUnisatProvider();
+      const provider = getXverseProvider();
       if (!provider) {
-        throw new Error('unisat not found');
+        throw new Error('xverse not found');
       }
 
       const accounts = await provider.requestAccounts();
@@ -95,7 +95,7 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
         address,
         signature,
         publicKey,
-        walletType: 'unisat'
+        walletType: 'xverse'
       };
 
       const responseLogin = await fetch(`/api/connect/login`, {
@@ -117,7 +117,7 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
       window.location.reload();
     } catch (err: any) {
       console.error('erro:', err);
-      setError(err.message || 'Failed to connect to Unisat wallet');
+      setError(err.message || 'Failed to connect to Xverse wallet');
     } finally {
       setIsLoading(false);
     }
@@ -126,9 +126,8 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
   return (
     <div>
       <button
-        onClick={handleConnect}
-        disabled={isLoading}
-        className="cursor-pointer w-full bg-orange-600 hover:bg-orange-700 disabled:bg-orange-800 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+        disabled
+        className="cursor-pointer w-full bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
       >
         {isLoading ? (
           <>
@@ -152,4 +151,4 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
   );
 };
 
-export default UnisatConnect;
+export default XverseConnect;

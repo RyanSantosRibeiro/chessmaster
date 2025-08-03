@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-interface UnisatConnectProps {
+interface PhantomConnectProps {
   onAddressChange?: (
     address: string,
     signature?: string,
@@ -16,9 +16,9 @@ export const checkWalletConnection = async (): Promise<{
   isConnected: boolean;
 }> => {
   try {
-    if ('unisat' in window) {
+    if ('phantom' in window) {
       const anyWindow = window as any;
-      const provider = anyWindow.unisat;
+      const provider = anyWindow.phantom;
 
       if (provider) {
         const accounts = await provider.getAccounts();
@@ -32,21 +32,21 @@ export const checkWalletConnection = async (): Promise<{
   }
 };
 
-const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
+const PhantomConnect = ({ onAddressChange, onClose }: PhantomConnectProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const getUnisatProvider = () => {
-    if ('unisat' in window) {
-      const anyWindow = window as any;
-      const provider = anyWindow.unisat;
+  const getPhantomProvider = () => {
+    if ('phantom' in window) {
+      const anyWindow = window;
+      const provider = anyWindow.phantom?.bitcoin;
 
-      if (provider) {
+      if (provider && provider.isPhantom) {
         return provider;
       }
     }
 
-    window.open('https://unisat.io/', '_blank');
+    window.open('https://phantom.app/', '_blank');
     return null;
   };
 
@@ -55,9 +55,9 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
       setIsLoading(true);
       setError('');
 
-      const provider = getUnisatProvider();
+      const provider = getPhantomProvider();
       if (!provider) {
-        throw new Error('unisat not found');
+        throw new Error('phantom not found');
       }
 
       const accounts = await provider.requestAccounts();
@@ -95,7 +95,7 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
         address,
         signature,
         publicKey,
-        walletType: 'unisat'
+        walletType: 'phantom'
       };
 
       const responseLogin = await fetch(`/api/connect/login`, {
@@ -117,7 +117,7 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
       window.location.reload();
     } catch (err: any) {
       console.error('erro:', err);
-      setError(err.message || 'Failed to connect to Unisat wallet');
+      setError(err.message || 'Failed to connect to Phantom wallet');
     } finally {
       setIsLoading(false);
     }
@@ -128,7 +128,7 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
       <button
         onClick={handleConnect}
         disabled={isLoading}
-        className="cursor-pointer w-full bg-orange-600 hover:bg-orange-700 disabled:bg-orange-800 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+        className="cursor-pointer w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
       >
         {isLoading ? (
           <>
@@ -144,7 +144,7 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
             </svg>
-            Connect Unisat
+            Connect Phantom
           </>
         )}
       </button>
@@ -152,4 +152,4 @@ const UnisatConnect = ({ onAddressChange, onClose }: UnisatConnectProps) => {
   );
 };
 
-export default UnisatConnect;
+export default PhantomConnect;

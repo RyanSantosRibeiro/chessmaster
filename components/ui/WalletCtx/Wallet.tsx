@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWallet } from '@/contexts/WalletContext';
 import UnisatConnect from './WalletsProviders/Unisat';
+import PhantomConnect from './WalletsProviders/Phantom';
+import XverseConnect from './WalletsProviders/Xverse';
 
 export default function WalletConnect() {
   const { profile } = useAuth();
@@ -16,7 +18,7 @@ export default function WalletConnect() {
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto bg-gray-900 rounded-lg">
+    <div className="p-6 max-w-md mx-auto">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-white">
           Connect Wallet
@@ -52,8 +54,28 @@ export default function WalletConnect() {
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 grid grid-cols-2 gap-4">
           <UnisatConnect 
+            onAddressChange={handleAddressChange}
+            onClose={() => {
+              const modal = document.getElementById('my_modal_2') as HTMLDialogElement;
+              if (modal) {
+                modal.close();
+              }
+            }}
+          />
+
+          <PhantomConnect 
+            onAddressChange={handleAddressChange}
+            onClose={() => {
+              const modal = document.getElementById('my_modal_2') as HTMLDialogElement;
+              if (modal) {
+                modal.close();
+              }
+            }}
+          />
+
+          <XverseConnect
             onAddressChange={handleAddressChange}
             onClose={() => {
               const modal = document.getElementById('my_modal_2') as HTMLDialogElement;
