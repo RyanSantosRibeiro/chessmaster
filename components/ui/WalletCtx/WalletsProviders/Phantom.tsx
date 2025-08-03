@@ -39,6 +39,7 @@ const PhantomConnect = ({ onAddressChange, onClose }: PhantomConnectProps) => {
   const getPhantomProvider = () => {
     if ('phantom' in window) {
       const anyWindow = window;
+      // @ts-ignore
       const provider = anyWindow.phantom?.bitcoin;
 
       if (provider && provider.isPhantom) {

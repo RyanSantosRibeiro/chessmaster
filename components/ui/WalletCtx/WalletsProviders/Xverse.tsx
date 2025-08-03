@@ -39,6 +39,7 @@ const XverseConnect = ({ onAddressChange, onClose }: XverseConnectProps) => {
   const getXverseProvider = () => {
     if ('xverse' in window) {
       const anyWindow = window;
+      // @ts-ignore
       const provider = anyWindow.xverse?.bitcoin;
 
       if (provider && provider.isXverse) {
