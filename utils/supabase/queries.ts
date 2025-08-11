@@ -171,3 +171,20 @@ export const sendTicket = async (payload: any) => {
       return error;
     } 
 }
+
+export const getHistory = async (payload: any) => {
+  try {
+      const response = await fetch(`/api/history`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+
+      return result.data;
+    } catch (error: any) {
+      return error;
+    } 
+}

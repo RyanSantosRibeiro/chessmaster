@@ -34,6 +34,12 @@ export default async function RootLayout({ children }: PropsWithChildren) {
           rel="stylesheet"
           type="text/css"
         />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Lexend+Exa:wght@100..900&display=swap"
+          rel="stylesheet"
+        ></link>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
       </head>
       <body className="bg-[#0e171e_!important]">
@@ -48,9 +54,9 @@ export default async function RootLayout({ children }: PropsWithChildren) {
                   id="skip"
                   className="min-h-screen max-h-screen w-full flex flex-col justify-start items-center justify-center overflow-x-hidden overflow-y-auto"
                 >
-                    <Topbar />
-                  
-                  <div className='w-full h-[100%] flex flex-col justify-start'>
+                  <Topbar />
+
+                  <div className="w-full h-[100%] flex flex-col justify-start">
                     {children}
                   </div>
                 </main>

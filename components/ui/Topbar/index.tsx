@@ -20,7 +20,7 @@ export default function Topbar() {
         <div className="ascend-bar-container h-full max-w-1/2">
           {token?.progress && (
             <div
-              className="ascend-bar flex justify-end items-center px-3 font-bold italic transition-all"
+              className="ascend-bar flex justify-end items-center px-3 font-bold italic transition-all text-xs"
               style={{
                 width: `${token?.progress ? token?.progress * 100 : 0}%`
               }}
@@ -29,14 +29,14 @@ export default function Topbar() {
             </div>
           )}
         </div>
-        <p className="font-semibold text-[10px] 2xl:text-[14px]">
+        <p className="font-semibold text-[10px] 2xl:text-[10px]">
           🎁 Incredible rewards for top 6 holders!
         </p>
       </div>
 
       {/* Update */}
       <div className="h-full flex gap-2 items-center justify-center">
-        <p className="font-semibold text-[10px] 2xl:text-[14px]">Next update:</p>
+        <p className="font-semibold text-[10px] 2xl:text-[10px]">Next update:</p>
         <p className="bg-[#2cb1c3] p-1 rounded font-bold italic text-[10px] 2xl:text-[14px]">
           Coliseum - Soon!
         </p>{' '}

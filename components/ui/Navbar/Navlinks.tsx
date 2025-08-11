@@ -40,7 +40,7 @@ export default function Navlinks({ user }: NavlinksProps) {
     <div className="relative flex flex-col justify-between py-4 align-center md:py-6 h-full">
       <div className="flex flex-col items-center flex-1">
         <p className='flex gap-2'>
-          <span className="text-2xl font-bold gradient-text font-display text-white">
+          <span className="text-lg font-bold gradient-text font-display text-white">
                 AURION
               </span>
               <span className="hidden sm:inline-flex bg-accent/20 text-accent text-xs px-2 py-1 rounded border border-accent/30 whitespace-pre-line">
@@ -54,11 +54,14 @@ export default function Navlinks({ user }: NavlinksProps) {
           <Link href="/play" className="transition-all duration-150 py-1 font-semibold rounded px-2 text-md hover:bg-[#182127]">
             ▶️ Play
           </Link>
-          <p className="linkDisable relative transition-all duration-150 py-1 font-semibold rounded px-2 opacity-30 cursor-default text-md">
-            🏛 Coliseum
-          </p>
+          <Link href="/history" className="transition-all duration-150 py-1 font-semibold rounded px-2 text-md hover:bg-[#182127]">
+            📜 History
+          </Link>
           <p className="linkDisable relative transition-all duration-150 py-1 font-semibold rounded px-2 opacity-30 cursor-default text-md">
             📜 Missions
+          </p>
+          <p className="linkDisable relative transition-all duration-150 py-1 font-semibold rounded px-2 opacity-30 cursor-default text-md">
+            🏛 Coliseum
           </p>
           <p className="linkDisable relative transition-all duration-150 py-1 font-semibold rounded px-2 opacity-30 cursor-default text-md">
             🌎 Friends
