@@ -20,7 +20,7 @@ export default function Topbar() {
         <div className="ascend-bar-container h-full max-w-1/2">
           {token?.progress && (
             <div
-              className="ascend-bar flex justify-end items-center px-3 font-bold italic transition-all text-xs"
+              className="ascend-bar flex justify-end items-center px-3 font-bold italic transition-all text-[9px]"
               style={{
                 width: `${token?.progress ? token?.progress * 100 : 0}%`
               }}
